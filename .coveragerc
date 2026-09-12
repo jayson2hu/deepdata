@@ -1,0 +1,17 @@
+[run]
+source =
+    src/core_data
+omit =
+    */core_data/cli.py
+    */core_data/config.py
+    */core_data/db/session.py
+    */core_data/scripts/*
+
+[report]
+include =
+    */core_data/*
+omit =
+    */core_data/cli.py
+    */core_data/config.py
+    */core_data/db/session.py
+    */core_data/scripts/*

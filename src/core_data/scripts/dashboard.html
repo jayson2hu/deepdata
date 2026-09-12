@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CodePick L0 Dashboard</title>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--ink:#101828;--muted:#667085;--line:#e7ebf0;--accent:#6366f1;--ok:#12b76a;--warn:#f79009;--bad:#f04438;--info:#2e90fa;--pad:18px}
+html[data-theme=dark]{--bg:#0a0d13;--card:#10141c;--ink:#e8ebf2;--muted:#98a2b3;--line:#1f2937;--accent:#8b5cf6}
+*{box-sizing:border-box}body{margin:0;background-color:var(--bg);color:var(--ink);font:14px/1.5 "Segoe UI","Microsoft YaHei",system-ui,sans-serif}
+.bar{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.bar-in,.wrap{max-width:1180px;margin:auto}.bar-in{height:58px;display:flex;align-items:center;gap:12px;padding:0 22px}.wrap{padding:24px 22px 36px}
+.logo{width:32px;height:32px;border-radius:9px;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:800}.brand{font-weight:700}.spacer{flex:1}
+button,input,select,textarea{font:inherit}.btn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:8px 12px;cursor:pointer}.btn:disabled{opacity:.45;cursor:not-allowed}.btn.primary{background:var(--accent);border-color:var(--accent);color:white}.btn.small{padding:5px 9px;font-size:12px}.icon{width:34px;height:34px;padding:0}
+.hero{display:flex;gap:16px;align-items:flex-end;margin-bottom:18px}.hero h1{margin:0;font-size:22px}.hero p{margin:4px 0 0;color:var(--muted)}
+.status{color:var(--muted);font-size:12px}.grid{display:grid;gap:16px}.kpis{grid-template-columns:repeat(4,1fr);margin-bottom:16px}.two{grid-template-columns:1.4fr 1fr;margin-bottom:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 1px 2px rgba(16,24,40,.04)}.card-h{display:flex;align-items:center;gap:10px;padding:var(--pad) var(--pad) 6px}.card-h h3{margin:0;font-size:14px}.card-b{padding:var(--pad)}
+.kpi{padding:var(--pad)}.kpi span{color:var(--muted);font-size:12px}.kpi strong{display:block;font-size:28px;margin-top:8px}.kpi em{display:block;color:var(--muted);font-style:normal;font-size:12px;margin-top:8px}
+table{width:100%;border-collapse:collapse}th,td{padding:11px var(--pad);border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{font-size:11px;color:var(--muted);text-transform:uppercase}tr:last-child td{border-bottom:0}
+.badge{display:inline-flex;border-radius:999px;padding:3px 8px;font-size:11px;font-weight:700;background:color-mix(in srgb,var(--muted) 14%,transparent);color:var(--muted)}.b-ok{color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}.b-warn{color:var(--warn);background:color-mix(in srgb,var(--warn) 14%,transparent)}.b-bad{color:var(--bad);background:color-mix(in srgb,var(--bad) 14%,transparent)}.b-info{color:var(--info);background:color-mix(in srgb,var(--info) 14%,transparent)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}.chip{border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:999px;padding:4px 9px;cursor:pointer}.chip.on{background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--accent);border-color:var(--accent)}
+.source{display:grid;grid-template-columns:1fr auto;gap:10px;padding:12px var(--pad);border-bottom:1px solid var(--line)}.source:last-child{border-bottom:0}.source b{display:block}.source small{color:var(--muted)}.source .acts{display:flex;gap:6px}.meta{color:var(--muted);font-size:12px;margin-top:3px}.trend{color:var(--info);font-weight:700}
+.pager{display:flex;align-items:center;gap:10px;padding:12px var(--pad);border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+.toast{position:fixed;right:18px;bottom:18px;display:grid;gap:8px;z-index:20}.toast div{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:10px 12px;box-shadow:0 12px 28px rgba(0,0,0,.14)}
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.38);display:none;place-items:center;z-index:10}.scrim.show{display:grid}.modal{width:min(560px,92vw);background:var(--card);border:1px solid var(--line);border-radius:12px}.modal h3{margin:0;padding:16px var(--pad);border-bottom:1px solid var(--line)}.form{display:grid;gap:12px;padding:var(--pad)}.form label{display:grid;gap:5px;color:var(--muted);font-size:12px}.form input,.form select,.form textarea{width:100%;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);padding:8px 10px}.form textarea{min-height:110px;font-family:ui-monospace,Consolas,monospace}.modal-f{display:flex;justify-content:flex-end;gap:10px;padding:14px var(--pad);border-top:1px solid var(--line)}
+@media(max-width:860px){.kpis,.two{grid-template-columns:1fr}.hero{display:block}.bar-in,.wrap{padding-left:14px;padding-right:14px}th,td{padding:9px 10px}.source{grid-template-columns:1fr}.source .acts{justify-content:flex-start}}
+</style>
+</head>
+<body>
+<div class="bar"><div class="bar-in">
+  <div class="logo">L0</div><div class="brand">CodePick 数据底座</div>
+  <div class="spacer"></div>
+  <button class="btn primary" id="addBtn">新增来源</button>
+  <button class="btn icon" id="refreshBtn" title="刷新">↻</button>
+  <button class="btn icon" id="themeBtn" title="主题">◐</button>
+</div></div>
+<main class="wrap">
+  <section class="hero">
+    <div><h1>管道总览</h1><p>多源采集、原始层、规范内容与事务 outbox</p></div>
+    <div class="spacer"></div><div class="status" id="stamp">连接中</div>
+  </section>
+  <section class="grid kpis" id="kpis"></section>
+  <section class="grid two">
+    <div class="card"><div class="card-h"><h3>最近内容</h3><div class="spacer"></div><div class="chips" id="chips"></div></div><table><thead><tr><th>ID</th><th>标题</th><th>状态</th></tr></thead><tbody id="content"></tbody></table></div>
+    <div class="card"><div class="card-h"><h3>采集来源</h3><span class="status" id="sourceCount"></span></div><div id="sources"></div></div>
+  </section>
+  <section class="card">
+    <div class="card-h"><h3>最近抓取任务</h3><div class="spacer"></div><span class="status" id="scheduler"></span></div>
+    <table><thead><tr><th>Job</th><th>来源</th><th>类型</th><th>统计/错误</th><th>状态</th></tr></thead><tbody id="jobs"></tbody></table>
+    <div class="pager"><span id="jobsRange"></span><div class="spacer"></div><button class="btn small" id="prevBtn">上一页</button><button class="btn small" id="nextBtn">下一页</button></div>
+  </section>
+</main>
+<div class="toast" id="toast"></div>
+<div class="scrim" id="scrim"><div class="modal">
+  <h3>新增采集来源</h3>
+  <div class="form">
+    <label>名称<input id="fName" autocomplete="off"></label>
+    <label>类型<select id="fType"></select></label>
+    <label>Feed URL<input id="fFeed" placeholder="RSS/Atom 使用"></label>
+    <label>主页 URL<input id="fHome"></label>
+    <label>抓取间隔（分钟）<input id="fInterval" type="number" min="1" value="60"></label>
+    <label><span><input id="fRender" type="checkbox" style="width:auto"> 渲染页面</span></label>
+    <label>类型参数 JSON<textarea id="fConfig">{}</textarea></label>
+  </div>
+  <div class="modal-f"><button class="btn" id="cancelBtn">取消</button><button class="btn primary" id="saveBtn">创建</button></div>
+</div></div>
+<script>
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const cfg=JSON.parse(localStorage.getItem('l0cfg')||'{}');
+let data=null,status='ALL',jobsOffset=0,sourceTypes=[],seq=0;
+const JOBS_LIMIT=8;
+if(cfg.theme)document.documentElement.dataset.theme=cfg.theme;
+function toast(msg){const el=document.createElement('div');el.textContent=msg;document.getElementById('toast').appendChild(el);setTimeout(()=>el.remove(),3500)}
+function badge(s){const v=String(s||'');const low=v.toLowerCase();let c='';if(low.includes('succe')||low.includes('ready'))c='b-ok';else if(low.includes('fail')||low.includes('error'))c='b-bad';else if(low.includes('wait')||low.includes('run'))c='b-warn';else if(v==='TREND'||v.includes('VARIANT'))c='b-info';return `<span class="badge ${c}">${esc(v)}</span>`}
+function api(path,body){return fetch(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||r.status);return d})}
+async function loadTypes(){const r=await fetch('/api/source-types');sourceTypes=(await r.json()).types||[];document.getElementById('fType').innerHTML=sourceTypes.map(t=>`<option value="${esc(t.type)}">${esc(t.label)} (${esc(t.type)})</option>`).join('')}
+async function load(){const my=++seq;try{const r=await fetch(`/api/status?jobs_offset=${jobsOffset}&jobs_limit=${JOBS_LIMIT}`,{cache:'no-store'});if(!r.ok)throw new Error(r.status);data=await r.json();if(my!==seq)return;render()}catch(e){document.getElementById('stamp').textContent='连接失败';toast('刷新失败：'+e.message)}}
+function render(){document.getElementById('stamp').textContent='更新于 '+String(data.generated_at).replace('T',' ');const c=data.counts;document.getElementById('kpis').innerHTML=[
+['来源',c.sources,`${c.sources_enabled} 启用`],['原始文档',c.raw_documents,'append-only'],['内容项',c.content_items,`${c.content_versions} 版本`],['投递率',Number(c.delivery_rate).toFixed(1)+'%',`${c.outbox_pending} 待发布`]
+].map(x=>`<div class="card kpi"><span>${x[0]}</span><strong>${x[1]}</strong><em>${x[2]}</em></div>`).join('');
+const sb=data.status_breakdown||{};const keys=['ALL',...Object.keys(sb)];document.getElementById('chips').innerHTML=keys.map(k=>`<button class="chip ${status===k?'on':''}" data-s="${esc(k)}">${k}</button>`).join('');
+let rows=data.recent_content||[];if(status!=='ALL')rows=rows.filter(r=>r.status===status);document.getElementById('content').innerHTML=rows.length?rows.map(r=>{const m=r.meta||{};const meta=r.status==='TREND'?`<div class="meta trend">#${esc(m.rank??'-')} ${esc(m.platform??'')} ${m.stars?esc(m.stars)+' stars':''}</div>`:'';return `<tr><td>#${r.id}</td><td><a href="${esc(r.canonical_url)}" target="_blank">${esc(r.title||'无标题')}</a>${meta}</td><td>${badge(r.status)}</td></tr>`}).join(''):'<tr><td colspan="3">暂无内容</td></tr>';
+const sources=data.sources||[];document.getElementById('sourceCount').textContent=sources.length+' 个';document.getElementById('sources').innerHTML=sources.length?sources.map(s=>`<div class="source"><div><b>${esc(s.name)} ${badge(s.type)}</b><small>${esc(s.feed_url||'无 feed')} · 间隔 ${esc(s.interval_min)}m · 下次 ${esc(s.next_run||'立即')}</small><div class="meta">health=${esc(s.health)} docs=${esc(s.doc_count)}</div></div><div class="acts"><button class="btn small" data-act="crawl" data-id="${s.id}" ${s.enabled?'':'disabled'}>抓取</button><button class="btn small" data-act="toggle" data-id="${s.id}">${s.enabled?'停用':'启用'}</button></div></div>`).join(''):'<div class="card-b">暂无来源</div>';
+const sch=data.scheduler||{};document.getElementById('scheduler').textContent=sch.running?`调度运行中 · ${sch.last_tick}`:`手动模式 · ${sch.last_tick||'无 tick'}`;
+const jobs=data.recent_jobs||[];document.getElementById('jobs').innerHTML=jobs.length?jobs.map(j=>`<tr><td>#${j.id}</td><td>${esc(j.source_id)}</td><td>${esc(j.kind)}</td><td>${j.error?esc(j.error):esc(JSON.stringify(j.stats||{}))}</td><td>${badge(j.status)}</td></tr>`).join(''):'<tr><td colspan="5">暂无任务</td></tr>';
+const p=data.jobs_page||{offset:0,limit:JOBS_LIMIT,total:0,has_prev:false,has_next:false};document.getElementById('jobsRange').textContent=`${p.total? p.offset+1:0}-${Math.min(p.offset+p.limit,p.total)} / ${p.total}`;document.getElementById('prevBtn').disabled=!p.has_prev;document.getElementById('nextBtn').disabled=!p.has_next}
+document.getElementById('chips').onclick=e=>{const b=e.target.closest('button');if(!b)return;status=b.dataset.s;render()};
+document.getElementById('sources').onclick=async e=>{const b=e.target.closest('button[data-act]');if(!b)return;const id=Number(b.dataset.id);b.disabled=true;try{if(b.dataset.act==='toggle')await api('/api/sources/toggle',{id});else await api('/api/crawl',{source_id:id});toast('操作完成');await load()}catch(err){toast('操作失败：'+err.message);b.disabled=false}};
+document.getElementById('prevBtn').onclick=()=>{jobsOffset=Math.max(0,jobsOffset-JOBS_LIMIT);load()};document.getElementById('nextBtn').onclick=()=>{jobsOffset+=JOBS_LIMIT;load()};
+document.getElementById('refreshBtn').onclick=load;document.getElementById('themeBtn').onclick=()=>{const root=document.documentElement;root.dataset.theme=root.dataset.theme==='dark'?'light':'dark';localStorage.setItem('l0cfg',JSON.stringify({theme:root.dataset.theme}))};
+const scrim=document.getElementById('scrim');document.getElementById('addBtn').onclick=()=>scrim.classList.add('show');document.getElementById('cancelBtn').onclick=()=>scrim.classList.remove('show');scrim.onclick=e=>{if(e.target===scrim)scrim.classList.remove('show')};
+document.getElementById('fType').onchange=()=>{const t=sourceTypes.find(x=>x.type===document.getElementById('fType').value);document.getElementById('fConfig').value=JSON.stringify(Object.fromEntries(Object.entries((t&&t.config_schema)||{}).map(([k,v])=>[k,v.default??''])),null,2)};
+document.getElementById('saveBtn').onclick=async()=>{try{const crawl_config=JSON.parse(document.getElementById('fConfig').value||'{}');crawl_config.interval_min=Number(document.getElementById('fInterval').value||60);crawl_config.render=document.getElementById('fRender').checked;await api('/api/sources',{name:document.getElementById('fName').value,type:document.getElementById('fType').value,feed_url:document.getElementById('fFeed').value,home_url:document.getElementById('fHome').value,crawl_config});scrim.classList.remove('show');toast('来源已创建');await load()}catch(e){toast('创建失败：'+e.message)}};
+loadTypes().then(()=>{document.getElementById('fType').onchange();load()});
+</script>
+</body>
+</html>

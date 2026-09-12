@@ -1,0 +1,26 @@
+
+
+# Local credentials, runtime state and generated files
+.env
+.env.*
+!.env.example
+.runtime/
+.claude/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+build/
+dist/
+*.log
+*.db
+*.sqlite
+*.sqlite3

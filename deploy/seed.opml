@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<opml version="2.0">
+  <head><title>CodePick L0 seed</title></head>
+  <body>
+    <outline text="Local fixture" title="Local fixture" type="rss" xmlUrl="file://tests/fixtures/rss/normal.xml" htmlUrl="https://example.com"/>
+  </body>
+</opml>

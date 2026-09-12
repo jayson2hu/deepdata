@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L0 数据底座 · 产品文档</title>
+<style>
+  :root{--bg:#f6f8fb;--card:#fff;--ink:#13202c;--muted:#54616f;--dim:#8896a4;--line:#e3e9f1;--acc:#0891b2;--acc2:#0e7490;--soft:#e6fafe;--green:#0d9488;--amber:#c2730a;--rose:#e11d48;--violet:#7c3aed}
+  *{box-sizing:border-box}html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;line-height:1.72;font-size:15px}
+  a{color:var(--acc)}.wrap{display:grid;grid-template-columns:236px 1fr;max-width:1240px;margin:0 auto}
+  nav{position:sticky;top:0;height:100vh;overflow-y:auto;padding:24px 14px;border-right:1px solid var(--line);background:#fff}
+  nav .bk{display:inline-block;font-size:10px;font-weight:800;letter-spacing:1px;color:#fff;background:var(--acc);padding:3px 9px;border-radius:6px;margin-bottom:8px}
+  nav .brand{font-weight:800;font-size:15px}nav .sub{color:var(--dim);font-size:11px;margin-bottom:14px}
+  nav a{display:block;color:var(--muted);padding:5.5px 11px;border-radius:8px;font-size:12.6px}
+  nav a:hover{background:var(--soft);color:var(--acc2);text-decoration:none}
+  main{padding:38px 52px 110px;min-width:0}
+  .tag{display:inline-block;background:var(--soft);color:var(--acc2);border:1px solid #a5e8f2;padding:4px 12px;border-radius:999px;font-size:12.5px;font-weight:700;margin-bottom:12px}
+  h1{font-size:29px;line-height:1.25;margin:0 0 10px;font-weight:800}h1 em{font-style:normal;color:var(--acc)}
+  .lede{color:var(--muted);font-size:16px;max-width:820px}
+  .meta{display:flex;gap:8px;flex-wrap:wrap;margin:15px 0}.mt{background:#fff;border:1px solid var(--line);border-radius:8px;padding:5px 11px;font-size:11.5px;color:var(--muted)}.mt b{color:var(--ink)}
+  section{margin:38px 0;scroll-margin-top:14px}
+  h2{font-size:20px;margin:0 0 6px;font-weight:800;display:flex;align-items:center;gap:10px;padding-bottom:7px;border-bottom:2px solid var(--line)}
+  h2 .x{background:var(--acc);color:#fff;width:25px;height:25px;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;font-size:12.5px;flex-shrink:0}
+  h3{font-size:15.5px;margin:18px 0 7px}
+  .note{color:var(--dim);font-size:12.5px;margin-bottom:12px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:17px 19px;margin:12px 0;box-shadow:0 1px 2px rgba(16,24,40,.04)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .mini{background:#fff;border:1px solid var(--line);border-radius:11px;padding:14px}.mini h4{margin:0 0 5px;font-size:13.8px}.mini p{margin:0;color:var(--muted);font-size:12.3px}.mini .ic{font-size:18px;margin-bottom:5px;display:block}
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:12.6px;background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}th{background:#e9f7fa;color:var(--ink);font-weight:700}td{color:var(--muted)}tr:last-child td{border-bottom:none}td strong{color:var(--ink)}
+  .hl{color:var(--acc2);font-weight:700}
+  ul.clean{margin:8px 0;padding-left:19px}ul.clean li{margin:4px 0;color:var(--muted)}ul.clean li strong{color:var(--ink)}
+  .callout{border-left:4px solid var(--acc);background:var(--soft);padding:12px 16px;border-radius:0 10px 10px 0;margin:12px 0;color:var(--muted)}.callout.amber{border-color:var(--amber);background:#fff8ec}.callout.green{border-color:var(--green);background:#effbf8}.callout b{color:var(--ink)}
+  code{background:#eef1f6;padding:1.5px 6px;border-radius:5px;font-size:12.2px;color:var(--violet);font-family:Consolas,monospace}
+  .badge{display:inline-block;font-size:10px;padding:2px 7px;border-radius:5px;font-weight:700;background:var(--soft);color:var(--acc2)}
+  .foot{margin-top:46px;padding-top:16px;border-top:1px solid var(--line);color:var(--dim);font-size:12px}
+  @media(max-width:980px){.wrap{grid-template-columns:1fr}nav{display:none}main{padding:22px 15px 60px}.grid2,.grid3{grid-template-columns:1fr}h1{font-size:23px}}
+  @media print{nav{display:none}.wrap{grid-template-columns:1fr}body{background:#fff}main{padding:0}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <span class="bk">LAYER 0</span>
+    <div class="brand">数据底座</div>
+    <div class="sub">产品文档 · Data Foundation</div>
+    <a href="#what">① 是什么</a>
+    <a href="#why">② 为何最重要</a>
+    <a href="#customers">③ 客户(上层)</a>
+    <a href="#principle">④ 全量保存原则</a>
+    <a href="#scope">⑤ 能力范围</a>
+    <a href="#contract">⑥ 数据契约</a>
+    <a href="#metrics">⑦ 核心指标</a>
+    <a href="#independent">⑧ 独立性</a>
+    <a href="#boundary">⑨ 边界(不做)</a>
+    <a href="#roadmap">⑩ 演进</a>
+  </nav>
+  <main>
+    <span class="tag">分层产品 1 / 4 · 产品文档</span>
+    <h1>L0 数据底座 — <em>Content Data Platform</em></h1>
+    <p class="lede">把全世界 AI Coding 相关内容采集进来，并<b>尽可能完整、不可变地保存全部信息</b>，成为整个平台唯一可信的数据真相源，为上层（L1–L3）提供数据驱动。这一层的信条只有一句：<b>数据是最重要的资产，宁可多存，绝不丢失。</b></p>
+    <div class="meta">
+      <span class="mt">层级：<b>L0（最底层）</b></span>
+      <span class="mt">形态：<b>内部数据产品 / 平台服务</b></span>
+      <span class="mt">客户：<b>L1 / L2 / L3（上层）</b></span>
+      <span class="mt">信条：<b>全量保存 · 可追溯 · 可重放</b></span>
+    </div>
+
+    <section id="what">
+      <h2><span class="x">1</span>是什么</h2>
+      <p>L0 是一个<b>独立的数据产品</b>：负责"把原始内容搬进来并完整保存好"，不做任何业务判断（评分、推荐都不在这层）。它对上层只承诺一件事——<span class="hl">提供干净、统一、完整、可追溯、可重放的内容数据</span>。</p>
+      <div class="grid3">
+        <div class="mini"><span class="ic">📥</span><h4>采集一切</h4><p>RSS、网页全文、播客、X/Twitter，多源接入，统一进库。</p></div>
+        <div class="mini"><span class="ic">🗄️</span><h4>完整保存</h4><p>原文 HTML、抓取元数据、媒体、源头原始条目——全部留存，不裁剪。</p></div>
+        <div class="mini"><span class="ic">🔁</span><h4>可重放驱动</h4><p>上层算法/模型升级时，可从原始数据重新加工，无需再抓一遍。</p></div>
+      </div>
+    </section>
+
+    <section id="why">
+      <h2><span class="x">2</span>为何它最重要</h2>
+      <div class="callout green"><b>数据是平台唯一不可再生的资产。</b>模型会换、评分标准会改、产品会迭代——但若当初没把原始数据存全，<b>历史就永远丢了，无法补回</b>。所以 L0 的设计原则不是"够用就好"，而是"<b>尽可能保存所有信息</b>"，把判断与裁剪全部推迟到上层。</div>
+      <ul class="clean">
+        <li><strong>重放价值</strong>：L1 的摘要 prompt、L2 的评分 rubric 一旦升级，可对全部历史原文重跑，立刻获得"全量升级"的效果——前提是原文还在。</li>
+        <li><strong>信任价值</strong>：每条内容都能追溯到"哪个源、何时抓、原文长啥样"，让上层与用户都能信任数据。</li>
+        <li><strong>资产价值</strong>：随时间累积的完整内容库，是后续做搜索、训练、跨垂直综合的底层燃料。</li>
+      </ul>
+    </section>
+
+    <section id="customers">
+      <h2><span class="x">3</span>它的客户：上层</h2>
+      <p class="note">L0 是平台型产品，它的"用户"不是终端读者，而是上面三层。</p>
+      <table>
+        <thead><tr><th>客户</th><th>它从 L0 要什么</th></tr></thead>
+        <tbody>
+          <tr><td><strong>L1 数据加工</strong></td><td>干净正文 + 元数据，用于基础分析；能按状态拉取待处理内容</td></tr>
+          <tr><td><strong>L2 判断/Agent</strong></td><td>偶尔回溯原文做深度判断；源信息用于来源偏好</td></tr>
+          <tr><td><strong>L3 产品/站点</strong></td><td>原文链接、来源、发布时间等展示用元数据</td></tr>
+          <tr><td><strong>未来：外部/重放</strong></td><td>重新加工历史数据；潜在的对外数据服务</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="principle">
+      <h2><span class="x">4</span>全量保存原则（核心）</h2>
+      <div class="grid2">
+        <div class="card"><h3 style="margin-top:0">保存什么（尽可能全）</h3><ul class="clean">
+          <li>源头原始条目（RSS entry / API 原始 JSON 全字段）</li>
+          <li>原始 HTML 全文（未清洗）+ 抓取快照</li>
+          <li>清洗后正文 + 抽取的结构（标题/作者/正文/图表）</li>
+          <li>抓取元数据：URL、HTTP 头、状态码、抓取时间、耗时、渲染方式</li>
+          <li>媒体资源：封面图、音频（播客）、关键图片</li>
+          <li>多版本：同一 URL 内容更新时保留历史版本</li>
+          <li>血缘/来源：哪个源、哪次抓取任务产生</li>
+        </ul></div>
+        <div class="card"><h3 style="margin-top:0">保存怎么做（原则）</h3><ul class="clean">
+          <li><strong>Raw-first 不可变</strong>：原始层只追加不修改，永不丢失</li>
+          <li><strong>原始与规范化分离</strong>：raw 存全、normalized 供查询</li>
+          <li><strong>去重但保留变体</strong>：同内容多源/多版本都留痕</li>
+          <li><strong>Schema-on-read</strong>：未知字段进 jsonb，先存下来再说</li>
+          <li><strong>幂等</strong>：重复抓取不产生脏数据</li>
+          <li><strong>冷热分层</strong>：热数据在库，冷原文进对象存储控成本</li>
+        </ul></div>
+      </div>
+      <div class="callout amber"><b>取舍：</b>"尽可能保存所有信息"会带来存储成本。应对：原文等大块进<b>对象存储（便宜）</b>，库里只留元数据与指针；冷数据转冷存储；但<b>默认不删原始数据</b>——存储很便宜，丢失的历史无价。</div>
+    </section>
+
+    <section id="scope">
+      <h2><span class="x">5</span>能力范围</h2>
+      <table>
+        <thead><tr><th>能力</th><th>说明</th><th>阶段</th></tr></thead>
+        <tbody>
+          <tr><td><strong>源注册与管理</strong></td><td>登记源、类型、抓取配置、所属垂直、公私属性</td><td><span class="badge">MVP</span></td></tr>
+          <tr><td><strong>RSS 采集</strong></td><td>定时轮询，解析条目，保存原始 entry</td><td><span class="badge">MVP</span></td></tr>
+          <tr><td><strong>网页全文抓取</strong></td><td>无头浏览器渲染 + 正文提取 + 原文保存</td><td><span class="badge">MVP</span></td></tr>
+          <tr><td><strong>去重</strong></td><td>url_hash / content_hash / simhash，保留变体</td><td><span class="badge">MVP</span></td></tr>
+          <tr><td><strong>内容实体规范化</strong></td><td>统一 ContentItem，供上层消费</td><td><span class="badge">MVP</span></td></tr>
+          <tr><td><strong>版本与变更检测</strong></td><td>内容更新保留历史版本</td><td>V1</td></tr>
+          <tr><td><strong>播客/媒体抓取</strong></td><td>音频下载 + 转写入口（转写在 L1）</td><td>V1</td></tr>
+          <tr><td><strong>源健康监控</strong></td><td>失败率、空窗、变更告警</td><td>V1</td></tr>
+          <tr><td><strong>数据血缘/重放</strong></td><td>lineage 追踪 + 重新加工触发</td><td>V1</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="contract">
+      <h2><span class="x">6</span>对上层的数据契约</h2>
+      <ul class="clean">
+        <li><strong>查询接口</strong>：按状态/源/时间拉取内容；按 id 取完整内容（含原文指针）。</li>
+        <li><strong>事件</strong>：新内容入库时发 <code>content.ingested</code>，上层据此触发加工。</li>
+        <li><strong>稳定字段</strong>：id、canonical_url、title、clean_text、lang、source、published_at、status —— 对上层稳定不变。</li>
+        <li><strong>状态</strong>：L0 负责把内容推进到 <code>WAIT_FILTER</code>（已入库待加工），后续状态由上层推进。</li>
+      </ul>
+      <div class="callout"><b>契约即解耦：</b>上层只依赖这份稳定契约，不关心 L0 内部如何抓取与存储。L0 可以随时优化采集实现而不影响上层——这正是"每层独立产品"的意义。</div>
+    </section>
+
+    <section id="metrics">
+      <h2><span class="x">7</span>核心指标</h2>
+      <div class="grid3">
+        <div class="mini"><span class="ic">📡</span><h4>采集覆盖率</h4><p>目标源的内容被采到的比例</p></div>
+        <div class="mini"><span class="ic">✅</span><h4>抓取成功率</h4><p>全文抓取成功 / 总尝试</p></div>
+        <div class="mini"><span class="ic">🧬</span><h4>数据完整度</h4><p>原文+元数据+媒体齐全的比例</p></div>
+        <div class="mini"><span class="ic">♻️</span><h4>可重放率</h4><p>能从原始数据重跑加工的比例</p></div>
+        <div class="mini"><span class="ic">🔁</span><h4>去重准确率</h4><p>正确合并/保留变体</p></div>
+        <div class="mini"><span class="ic">⏱️</span><h4>采集时延</h4><p>源发布到入库的延迟</p></div>
+      </div>
+    </section>
+
+    <section id="independent">
+      <h2><span class="x">8</span>独立性</h2>
+      <p>L0 可<b>独立部署、独立演进、独立验证</b>：不依赖上层即可运行（只采集与保存）。理论上它本身就是一个可复用的"内容数据平台"，未来可服务多个垂直站，甚至作为对外数据服务。<b>但它的价值只有在被上层消费时才兑现</b>——它存在的全部意义是为上层提供数据驱动。</p>
+    </section>
+
+    <section id="boundary">
+      <h2><span class="x">9</span>边界：L0 不做什么</h2>
+      <ul class="clean">
+        <li><strong>不做业务判断</strong>：不评分、不打"好坏"标签、不推荐——那是 L2。</li>
+        <li><strong>不做内容理解</strong>：不摘要、不抽实体——那是 L1。</li>
+        <li><strong>不感知垂直</strong>：L0 不知道"AI Coding"，只知道"内容与源"。垂直归属是上层的事。</li>
+        <li><strong>不直接面向终端用户</strong>：不渲染页面、不管账户。</li>
+      </ul>
+    </section>
+
+    <section id="roadmap">
+      <h2><span class="x">10</span>演进</h2>
+      <table>
+        <thead><tr><th>阶段</th><th>重点</th></tr></thead>
+        <tbody>
+          <tr><td>MVP</td><td>RSS + 网页全文采集、完整原文保存、去重、规范化、事件</td></tr>
+          <tr><td>V1</td><td>版本/变更检测、源健康监控、播客媒体、血缘与重放</td></tr>
+          <tr><td>V2</td><td>冷热分层与成本优化、对外数据服务、跨垂直源池</td></tr>
+        </tbody>
+      </table>
+      <div class="callout green"><b>配套：</b>本产品的技术实现见《L0 数据底座 · 架构设计文档》。</div>
+    </section>
+
+    <div class="foot">L0 数据底座 · 产品文档 · CodePick 分层平台（1/4）· 信条：全量保存 · 可追溯 · 可重放 · 2026-05-30</div>
+  </main>
+</div>
+</body>
+</html>

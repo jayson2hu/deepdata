@@ -1,0 +1,6 @@
+{
+  "data": [
+    {"title": "Alpha hot topic", "url": "https://example.test/a", "heat": "999", "rank": 1},
+    {"word": "Beta hot topic", "link": "https://example.test/b", "hotValue": "888", "rank": 2}
+  ]
+}

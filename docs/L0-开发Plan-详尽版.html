@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L0 数据底座 · 详尽开发 Plan</title>
+<style>
+  :root{--bg:#f5f9fb;--card:#fff;--ink:#102230;--muted:#516373;--dim:#8497a6;--line:#dde7ef;--acc:#0891b2;--acc2:#0e7490;--soft:#e3fafe;--green:#0d9488;--gsoft:#e6f9f3;--blue:#2563eb;--bsoft:#e9f0fe;--amber:#c2730a;--asoft:#fff6e8;--rose:#e11d48;--violet:#7c3aed}
+  *{box-sizing:border-box}html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;line-height:1.7;font-size:14.5px}
+  a{color:var(--acc)}.wrap{display:grid;grid-template-columns:252px 1fr;max-width:1300px;margin:0 auto}
+  nav{position:sticky;top:0;height:100vh;overflow-y:auto;padding:22px 13px;border-right:1px solid var(--line);background:#fff}
+  nav .bk{display:inline-block;font-size:10px;font-weight:800;letter-spacing:1px;color:#fff;background:var(--acc);padding:3px 9px;border-radius:6px;margin-bottom:7px}
+  nav .brand{font-weight:800;font-size:14.5px}nav .sub{color:var(--dim);font-size:11px;margin-bottom:12px}
+  nav a{display:block;color:var(--muted);padding:5px 10px;border-radius:7px;font-size:12.3px}nav a:hover{background:var(--soft);color:var(--acc2);text-decoration:none}
+  nav .grp{color:var(--dim);font-size:10px;text-transform:uppercase;letter-spacing:1px;margin:12px 0 2px 10px}
+  main{padding:36px 50px 110px;min-width:0}
+  .tag{display:inline-block;background:var(--soft);color:var(--acc2);border:1px solid #a5e8f2;padding:4px 12px;border-radius:999px;font-size:12.5px;font-weight:700;margin-bottom:12px}
+  h1{font-size:28px;line-height:1.25;margin:0 0 10px;font-weight:800}h1 em{font-style:normal;color:var(--acc)}
+  .lede{color:var(--muted);font-size:15.5px;max-width:830px}
+  .meta{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}.mt{background:#fff;border:1px solid var(--line);border-radius:8px;padding:5px 11px;font-size:11.5px;color:var(--muted)}.mt b{color:var(--ink)}
+  section{margin:34px 0;scroll-margin-top:12px}
+  h2{font-size:20px;margin:0 0 6px;font-weight:800;display:flex;align-items:center;gap:10px;padding-bottom:7px;border-bottom:2px solid var(--line)}
+  h2 .x{background:var(--acc);color:#fff;min-width:25px;height:25px;padding:0 6px;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
+  h3{font-size:15px;margin:18px 0 7px}.note{color:var(--dim);font-size:12.3px;margin-bottom:12px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:12px 0;box-shadow:0 1px 2px rgba(16,24,40,.04)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:12.4px;background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  th,td{padding:8px 11px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}th{background:#e7f6f9;color:var(--ink);font-weight:700}td{color:var(--muted)}tr:last-child td{border-bottom:none}td strong{color:var(--ink)}
+  .hl{color:var(--acc2);font-weight:700}
+  ul.clean{margin:7px 0;padding-left:18px}ul.clean li{margin:3px 0;color:var(--muted)}ul.clean li strong{color:var(--ink)}
+  code{background:#eef2f5;padding:1.5px 6px;border-radius:5px;font-size:12px;color:var(--violet);font-family:Consolas,monospace}
+  pre{background:#0a1820;border:1px solid var(--line);border-radius:11px;padding:14px 16px;overflow-x:auto;font-size:11.6px;line-height:1.5;color:#bfdae2;margin:11px 0}
+  pre .c{color:#5d7c8a}pre .k{color:#7dd3fc}pre .s{color:#6ee7b7}pre .y{color:#fcd34d}pre .t{color:#c4b5fd}
+  /* feature card */
+  .feat{border:1px solid var(--line);border-radius:12px;margin:13px 0;overflow:hidden;background:#fff}
+  .feat .fh{display:flex;align-items:center;gap:10px;padding:11px 16px;background:#f0f8fa;border-bottom:1px solid var(--line)}
+  .feat .fid{font-weight:800;color:var(--acc2);font-size:12.5px;background:#fff;border:1px solid #a5e8f2;padding:2px 8px;border-radius:6px;flex-shrink:0}
+  .feat .ft{font-weight:700;font-size:14.5px;color:var(--ink);flex:1}
+  .feat .eff{font-size:11px;color:var(--dim);background:#fff;border:1px solid var(--line);padding:2px 8px;border-radius:6px;flex-shrink:0}
+  .feat .fb{padding:13px 16px}
+  .feat .fdesc{color:var(--muted);font-size:12.8px;margin:0 0 9px}
+  .lbl{font-size:11px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;margin:10px 0 5px;display:flex;align-items:center;gap:6px}
+  .lbl.task{color:var(--acc2)}.lbl.acc{color:var(--green)}.lbl.test{color:var(--blue)}
+  .subtasks{list-style:none;padding:0;margin:0}
+  .subtasks li{padding:4px 0 4px 26px;position:relative;font-size:12.8px;color:var(--muted)}
+  .subtasks li::before{content:"☐";position:absolute;left:2px;top:3px;color:var(--acc);font-size:14px}
+  .subtasks li b{color:var(--ink)}
+  .box{border-radius:9px;padding:10px 13px;margin:6px 0;font-size:12.6px}
+  .box.acc{background:var(--gsoft);border:1px solid #aee6d8}.box.acc b{color:#0f766e}
+  .box.test{background:var(--bsoft);border:1px solid #c3d6fb}.box.test b{color:#1d4ed8}
+  .box ul{margin:5px 0 0;padding-left:18px}.box li{margin:2px 0;color:var(--muted)}
+  .callout{border-left:4px solid var(--acc);background:var(--soft);padding:11px 15px;border-radius:0 10px 10px 0;margin:12px 0;color:var(--muted)}.callout.amber{border-color:var(--amber);background:var(--asoft)}.callout.green{border-color:var(--green);background:var(--gsoft)}.callout b{color:var(--ink)}
+  .epic-tag{display:inline-block;font-size:10px;font-weight:800;padding:2px 8px;border-radius:5px;background:var(--soft);color:var(--acc2);margin-right:6px}
+  .pri{display:inline-block;font-size:10px;font-weight:700;padding:1px 7px;border-radius:5px}
+  .p-must{background:#fde8ea;color:#b91c3a}.p-should{background:#fff0d9;color:#a4670a}
+  .foot{margin-top:46px;padding-top:16px;border-top:1px solid var(--line);color:var(--dim);font-size:12px}
+  @media(max-width:980px){.wrap{grid-template-columns:1fr}nav{display:none}main{padding:22px 14px 60px}.grid2,.grid3{grid-template-columns:1fr}h1{font-size:22px}}
+  @media print{nav{display:none}.wrap{grid-template-columns:1fr}body{background:#fff}main{padding:0}.feat,.card{box-shadow:none;break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <span class="bk">LAYER 0</span>
+    <div class="brand">数据底座 · 开发 Plan</div>
+    <div class="sub">详尽版 · 含验收与自测</div>
+    <a href="#about">文档说明与范围</a>
+    <a href="#prereq">前置与技术基线</a>
+    <a href="#sprints">里程碑（4 个 Sprint）</a>
+    <a href="#ddl">数据库 DDL</a>
+    <div class="grp">功能拆解（EPIC）</div>
+    <a href="#e0">E0 工程基建</a>
+    <a href="#e1">E1 源管理</a>
+    <a href="#e2">E2 采集调度</a>
+    <a href="#e3">E3 RSS 采集</a>
+    <a href="#e4">E4 网页抓取</a>
+    <a href="#e5">E5 去重与规范化</a>
+    <a href="#e6">E6 原始层与版本</a>
+    <a href="#e7">E7 事件与契约</a>
+    <a href="#e8">E8 媒体抓取(后置)</a>
+    <div class="grp">质量</div>
+    <a href="#teststrategy">测试策略</a>
+    <a href="#dod">L0 总验收 (DoD)</a>
+    <a href="#risk">风险与依赖</a>
+  </nav>
+  <main>
+    <span class="tag">开发 Plan · L0 数据底座 · 详尽版</span>
+    <h1>L0 数据底座 — <em>详尽开发计划</em></h1>
+    <p class="lede">把 L0 拆成 9 个 EPIC、约 35 个可独立交付的小功能，每个小功能都给出<b>子任务清单、验收标准（DoD）、自测方法</b>。可直接照此排期开工。核心信条不变：<b>全量保存、可追溯、可重放</b>。</p>
+    <div class="meta">
+      <span class="mt">范围：<b>仅 L0（采集+存储+规范化+事件）</b></span>
+      <span class="mt">EPIC：<b>9 个</b></span>
+      <span class="mt">小功能：<b>~35 个</b></span>
+      <span class="mt">预估：<b>~23 人日（单人）</b></span>
+      <span class="mt">栈：<b>Python · PG · 对象存储 · Redis/Arq</b></span>
+    </div>
+
+    <section id="about">
+      <h2><span class="x">i</span>文档说明与范围</h2>
+      <div class="card">
+        <p style="margin-top:0"><b>本文档只覆盖 L0</b>（数据底座）。不含 L1 分析、L2 判断、L3 产品——那些有各自的 Plan。L0 的唯一职责：把内容采进来、完整存下去、规范化、去重、发事件给上层。</p>
+        <p><b>结构</b>：EPIC（大功能）→ Feature（小功能，可独立交付与验收）→ 子任务（实现单元）。每个 Feature 配 <span style="color:var(--green);font-weight:700">验收标准</span> 与 <span style="color:var(--blue);font-weight:700">自测方法</span>。</p>
+        <p style="margin-bottom:0"><b>优先级</b>：<span class="pri p-must">MUST</span> = MVP 必需；<span class="pri p-should">SHOULD</span> = V1 完善。先做完所有 MUST 即得到可运行的数据底座。</p>
+      </div>
+    </section>
+
+    <section id="prereq">
+      <h2><span class="x">0</span>前置与技术基线</h2>
+      <table>
+        <thead><tr><th>项</th><th>选型/版本</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td>语言/运行</td><td>Python 3.12 + uv</td><td>monorepo workspace，<code>packages/core_data</code></td></tr>
+          <tr><td>数据库</td><td>PostgreSQL 16 (+pgvector 扩展)</td><td>L0 表不用向量，但平台统一装扩展</td></tr>
+          <tr><td>ORM/迁移</td><td>SQLAlchemy 2.x + Alembic</td><td>所有表走迁移，禁止手改</td></tr>
+          <tr><td>对象存储</td><td>S3 兼容（本地 MinIO / 云 R2）</td><td>存 raw_html、清洗正文、媒体</td></tr>
+          <tr><td>队列/调度</td><td>Redis + Arq</td><td>采集任务异步化、定时</td></tr>
+          <tr><td>抓取</td><td>httpx · feedparser · Playwright · trafilatura</td><td>RSS + 渲染抓取 + 正文提取</td></tr>
+          <tr><td>测试</td><td>pytest · pytest-asyncio · testcontainers / docker-compose 测试 PG</td><td>真 PG 测试（pgvector 需要）</td></tr>
+          <tr><td>质量</td><td>ruff + mypy + pre-commit</td><td>lint/type 门禁</td></tr>
+        </tbody>
+      </table>
+      <div class="callout"><b>依赖方向约束：</b><code>core_data</code> 不得 import 上层（L1/L2/L3）包；由 import-lint 规则强制。L0 只对外暴露查询接口与事件。</div>
+    </section>
+
+    <section id="sprints">
+      <h2><span class="x">▦</span>里程碑（4 个 Sprint）</h2>
+      <table>
+        <thead><tr><th>Sprint</th><th>目标</th><th>含 EPIC</th><th>预估</th><th>产出（可演示）</th></tr></thead>
+        <tbody>
+          <tr><td><strong>L0-S1 基建</strong></td><td>工程骨架跑通，能建表、连存储、跑队列</td><td>E0</td><td>~5d</td><td>迁移建表成功 + 健康检查 + 一个示例任务入队执行</td></tr>
+          <tr><td><strong>L0-S2 源+RSS</strong></td><td>登记源、定时拉 RSS、保存原始 entry</td><td>E1·E2·E3</td><td>~6d</td><td>导入 OPML → 自动拉取 → raw_documents 有数据</td></tr>
+          <tr><td><strong>L0-S3 抓取+去重</strong></td><td>全文抓取、正文提取、去重建实体</td><td>E4·E5</td><td>~7d</td><td>一条 RSS 链接 → 全文入对象存储 → content_items(WAIT_FILTER)</td></tr>
+          <tr><td><strong>L0-S4 原始层+事件</strong></td><td>版本、血缘、事件、查询/重放接口</td><td>E6·E7</td><td>~5d</td><td>更新内容产生新版本 + content.ingested 事件 + L1 可拉取</td></tr>
+          <tr><td>（后置）媒体</td><td>封面/播客音频</td><td>E8</td><td>~3d</td><td>V1 再做</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="ddl">
+      <h2><span class="x">▤</span>数据库 DDL（L0，可执行）</h2>
+      <pre><span class="c">-- 平台统一扩展（L0 表不用向量，L1 用）</span>
+CREATE EXTENSION IF NOT EXISTS vector;
+
+<span class="c">-- 源注册表</span>
+CREATE TABLE <span class="k">sources</span>(
+  id BIGSERIAL PRIMARY KEY,
+  name TEXT NOT NULL, feed_url TEXT, home_url TEXT,
+  type TEXT NOT NULL CHECK (type IN ('article','podcast','video','tweet')),
+  crawl_config JSONB NOT NULL DEFAULT '{}',   <span class="c">-- 选择器/周期/渲染开关</span>
+  etiquette JSONB NOT NULL DEFAULT '{}',      <span class="c">-- rate/concurrency/robots</span>
+  vertical_codes TEXT[] NOT NULL DEFAULT '{}',
+  is_public BOOL NOT NULL DEFAULT true, owner_user_id BIGINT,
+  enabled BOOL NOT NULL DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT now(), updated_at TIMESTAMPTZ DEFAULT now());
+
+CREATE TABLE <span class="k">source_health</span>(
+  source_id BIGINT PRIMARY KEY REFERENCES sources(id),
+  last_ok_at TIMESTAMPTZ, last_attempt_at TIMESTAMPTZ,
+  fail_count INT DEFAULT 0, empty_streak INT DEFAULT 0,
+  status TEXT DEFAULT 'unknown', note TEXT);
+
+CREATE TABLE <span class="k">crawl_jobs</span>(
+  id BIGSERIAL PRIMARY KEY, source_id BIGINT REFERENCES sources(id),
+  kind TEXT NOT NULL, started_at TIMESTAMPTZ DEFAULT now(), finished_at TIMESTAMPTZ,
+  status TEXT DEFAULT 'running', stats JSONB DEFAULT '{}', error TEXT);
+
+<span class="c">-- ① 原始层（不可变，只追加）</span>
+CREATE TABLE <span class="k">raw_documents</span>(
+  id BIGSERIAL PRIMARY KEY, source_id BIGINT REFERENCES sources(id),
+  crawl_job_id BIGINT REFERENCES crawl_jobs(id),
+  url TEXT NOT NULL, fetch_method TEXT NOT NULL,
+  http_status INT, http_headers JSONB, fetched_at TIMESTAMPTZ DEFAULT now(),
+  raw_entry JSONB,            <span class="c">-- RSS/API 原始条目全字段</span>
+  raw_html_ref TEXT, raw_html_sha256 TEXT,  <span class="c">-- 对象存储指针 + 校验和</span>
+  media_refs JSONB DEFAULT '[]', extra JSONB DEFAULT '{}');
+CREATE INDEX ON raw_documents(source_id, fetched_at);
+CREATE INDEX ON raw_documents(raw_html_sha256);
+
+<span class="c">-- ② 规范层（派生，可重建，上层主消费）</span>
+CREATE TABLE <span class="k">content_items</span>(
+  id BIGSERIAL PRIMARY KEY,
+  canonical_url TEXT NOT NULL, url_hash TEXT NOT NULL UNIQUE,
+  content_hash TEXT, simhash BIGINT,
+  title TEXT, author TEXT, clean_text_ref TEXT, lang TEXT,
+  source_id BIGINT REFERENCES sources(id), published_at TIMESTAMPTZ,
+  fetched_at TIMESTAMPTZ DEFAULT now(), current_version INT DEFAULT 1,
+  raw_document_id BIGINT REFERENCES raw_documents(id),
+  status TEXT NOT NULL DEFAULT 'WAIT_FILTER',
+  meta JSONB DEFAULT '{}', created_at TIMESTAMPTZ DEFAULT now(), updated_at TIMESTAMPTZ DEFAULT now());
+CREATE INDEX ON content_items(status, fetched_at);
+CREATE INDEX ON content_items(source_id, published_at);
+CREATE INDEX ON content_items(content_hash);
+
+<span class="c">-- 版本历史</span>
+CREATE TABLE <span class="k">content_versions</span>(
+  id BIGSERIAL PRIMARY KEY, content_id BIGINT REFERENCES content_items(id),
+  version INT NOT NULL, raw_document_id BIGINT REFERENCES raw_documents(id),
+  clean_text_ref TEXT, content_hash TEXT, diff_summary TEXT,
+  detected_at TIMESTAMPTZ DEFAULT now(), UNIQUE(content_id, version));
+
+<span class="c">-- ③ 事件发件箱（事务性 outbox，保证事件不丢）</span>
+CREATE TABLE <span class="k">outbox_events</span>(
+  id BIGSERIAL PRIMARY KEY, topic TEXT NOT NULL, payload JSONB NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT now(), published_at TIMESTAMPTZ);
+CREATE INDEX ON outbox_events(published_at) WHERE published_at IS NULL;</pre>
+      <div class="callout green"><b>设计落点：</b>原始层(raw_documents) 与规范层(content_items) 通过 <code>raw_document_id</code> 强绑定可溯源；大文本只存对象存储指针 + sha256；<code>outbox_events</code> 用事务性发件箱保证"入库与发事件"原子一致、事件不丢。</div>
+    </section>
+
+    <!-- E0 -->
+    <section id="e0">
+      <h2><span class="x">E0</span>工程基建 <span class="pri p-must">MUST</span></h2>
+      <p class="note">目标：可建表、可连存储、可跑队列、可观测。后续所有 EPIC 的地基。</p>
+
+      <div class="feat"><div class="fh"><span class="fid">F0.1</span><span class="ft">仓库骨架与依赖</span><span class="eff">0.5d</span></div><div class="fb">
+        <p class="fdesc">建立 <code>packages/core_data</code> 与 <code>workers/ingestion</code>，配 uv workspace、ruff、mypy、pre-commit。</p>
+        <div class="lbl task">◇ 子任务</div><ul class="subtasks"><li>初始化 uv workspace 与目录结构</li><li>配置 ruff + mypy + pre-commit + import-lint（禁止 core_data 依赖上层）</li><li>建 <code>settings.py</code>（pydantic-settings 读 env）</li></ul>
+        <div class="box acc"><b>✓ 验收</b><ul><li><code>uv sync</code> 成功；<code>ruff check</code> 与 <code>mypy</code> 零错误</li><li>import-lint 在尝试从 core_data 引用上层时报错</li></ul></div>
+        <div class="box test"><b>⚙ 自测</b><ul><li><code>pre-commit run --all-files</code> 全绿</li><li>写一行 <code>from app_l1 import x</code> 验证 import-lint 拦截</li></ul></div>
+      </div></div>
+
+      <div class="feat"><div class="fh"><span class="fid">F0.2</span><span class="ft">数据库接入与迁移</span><span class="eff">1d</span></div><div class="fb">
+        <p class="fdesc">SQLAlchemy 2.x 模型 + Alembic 迁移，落地上面的 DDL。</p>
+        <div class="lbl task">◇ 子任务</div><ul class="subtasks"><li>定义 ORM 模型（sources/raw_documents/content_items/...）</li><li><code>alembic revision --autogenerate</code> 生成首个迁移</li><li>会话/连接池封装；建 <code>vector</code> 扩展的迁移步骤</li></ul>
+        <div class="box acc"><b>✓ 验收</b><ul><li><code>alembic upgrade head</code> 在空库成功建出全部表与索引</li><li><code>alembic downgrade base</code> 可回滚干净</li><li>模型与迁移一致（autogenerate 无差异）</li></ul></div>
+        <div class="box test"><b>⚙ 自测</b><ul><li>pytest：用 testcontainers 起 PG，upgrade→downgrade→upgrade 通过</li><li>断言 <code>information_schema</code> 存在 6 张表 + 关键索引</li></ul></div>
+      </div></div>
+
+      <div class="feat"><div class="fh"><span class="fid">F0.3</span><span class="ft">对象存储客户端</span><span class="eff">0.5d</span></div><div class="fb">
+        <p class="fdesc">S3 兼容存储封装：put/get/exists，按 key 规范组织（如 <code>raw/{source}/{sha256}.html</code>）。</p>
+        <div class="lbl task">◇ 子任务</div><ul class="subtasks"><li>封装 <code>ObjectStore</code>（put_bytes/get_bytes/key 生成）</li><li>本地用 MinIO，云端用 R2/S3，靠 env 切换</li></ul>
+        <div class="box acc"><b>✓ 验收</b><ul><li>put 后 get 内容一致；exists 准确；key 含 sha256 防冲突</li></ul></div>
+        <div class="box test"><b>⚙ 自测</b><ul><li>pytest：起 MinIO 容器，put/get 往返断言字节相等</li></ul></div>
+      </div></div>
+
+      <div class="feat"><div class="fh"><span class="fid">F0.4</span><span class="ft">队列与调度（Arq）</span><span class="eff">1d</span></div><div class="fb">
+        <p class="fdesc">Redis + Arq worker，支持入队任务与 cron 定时。</p>
+        <div class="lbl task">◇ 子任务</div><ul class="subtasks"><li>Arq worker 启动配置；连接 Redis</li><li>定义一个示例任务并能入队/执行</li><li>cron 配置占位（供 E2 调度用）</li></ul>
+        <div class="box acc"><b>✓ 验收</b><ul><li>入队任务被 worker 消费并执行；失败任务有重试</li></ul></div>
+        <div class="box test"><b>⚙ 自测</b><ul><li>集成测试：入队 <code>ping</code> 任务，断言副作用（写一条记录）发生</li></ul></div>
+      </div></div>
+
+      <div class="feat"><div class="fh"><span class="fid">F0.5</span><span class="ft">可观测与配置基线</span><span class="eff">0.5d</span></div><div class="fb">
+        <p class="fdesc">结构化日志、错误捕获、健康检查。</p>
+        <div class="lbl task">◇ 子任务</div><ul class="subtasks"><li>结构化日志（structlog）含 trace_id</li><li><code>/healthz</code>（DB/Redis/对象存储连通性）</li><li>统一异常与重试装饰器</li></ul>
+        <div class="box acc"><b>✓ 验收</b><ul><li><code>/healthz</code> 三依赖全通返回 200，任一断开返回 503</li></ul></div>
+        <div class="box test"><b>⚙ 自测</b><ul><li>断开 Redis，断言 healthz 返回 503 且日志含原因</li></ul></div>
+      </div></div>
+    </section>
+
+    <!-- E1 -->
+    <section id="e1">
+      <h2><span class="x">E1</span>源管理 <span class="pri p-must">MUST</span></h2>
+      <div class="feat"><div class="fh"><span class="fid">F1.1</span><span class="ft">源 CRUD 与模型</span><span class="eff">1d</span></div><div class="fb">
+        <p class="fdesc">登记/编辑/启停源，含类型、抓取配置、所属垂直、礼貌策略。</p>
+        <div class="lbl task">◇ 子任务</div><ul class="subtasks"><li>Repository：create/update/list/disable</li><li>校验：feed_url 合法、type 枚举、唯一性</li><li>简易 CLI：<code>core-data source add/list</code></li></ul>
+        <div class="box acc"><b>✓ 验收</b><ul><li>可增删改查源；重复 feed_url 被拒；禁用源不参与后续采集</li></ul></div>
+        <div class="box test"><b>⚙ 自测</b><ul><li>pytest：建源→改配置→禁用，断言状态；重复 url 抛唯一约束</li><li>CLI 手测：<code>source add --feed ... --vertical ai-coding</code> 后 <code>list</code> 可见</li></ul></div>
+      </div></div>
+
+      <div class="feat"><div class="fh"><span class="fid">F1.2</span><span class="ft">OPML 批量导入</span><span class="eff">0.5d</span></div><div class="fb">
+        <p class="fdesc">导入 OPML 文件批量建源（沿用 BestBlogs 公开 OPML 起步）。</p>
+        <div class="lbl task">◇ 子任务</div><ul class="subtasks"><li>解析 OPML → 源列表</li><li>幂等导入（已存在跳过/更新）</li></ul>
+        <div class="box acc"><b>✓ 验收</b><ul><li>导入 N 条 OPML 得 N 个源；重复导入不产生重复</li></ul></div>
+        <div class="box test"><b>⚙ 自测</b><ul><li>pytest：用样例 OPML 导入两次，断言源数不变</li></ul></div>
+      </div></div>
+
+      <div class="feat"><div class="fh"><span class="fid">F1.3</span><span class="ft">源健康监控</span><span class="eff">1d</span><span class="pri p-should">SHOULD</span></div><div class="fb">
+        <p class="fdesc">记录每源成功/失败/空窗，异常告警。</p>
+        <div class="lbl task">◇ 子任务</div><ul class="subtasks"><li>每次采集更新 source_health（ok/fail/empty_streak）</li><li>连续失败/空窗超阈值标记 degraded 并告警</li></ul>
+        <div class="box acc"><b>✓ 验收</b><ul><li>连续 N 次失败的源 status=degraded；恢复后回 healthy</li></ul></div>
+        <div class="box test"><b>⚙ 自测</b><ul><li>pytest：模拟连续失败，断言 status 翻转与告警触发</li></ul></div>
+      </div></div>
+    </section>
+
+    <!-- E2 -->
+    <section id="e2">
+      <h2><span class="x">E2</span>采集调度 <span class="pri p-must">MUST</span></h2>
+      <div class="feat"><div class="fh"><span class="fid">F2.1</span><span class="ft">周期调度器</span><span class="eff">1d</span></div><div class="fb">
+        <p class="fdesc">按源的周期把采集任务入队（cron 扫描 + 入队）。</p>
+        <div class="lbl task">◇ 子任务</div><ul class="subtasks"><li>cron 扫描 enabled 源，按 crawl_config.interval 决定是否到期</li><li>到期则入队 <code>crawl_source(source_id)</code></li></ul>
+        <div class="box acc"><b>✓ 验收</b><ul><li>到期源被入队恰一次；未到期不入队；禁用源跳过</li></ul></div>
+        <div class="box test"><b>⚙ 自测</b><ul><li>pytest：构造不同 last_run 的源，断言入队集合正确</li></ul></div>
+      </div></div>
+
+      <div class="feat"><div class="fh"><span class="fid">F2.2</span><span class="ft">crawl_jobs 任务记录</span><span class="eff">0.5d</span></div><div class="fb">
+        <p class="fdesc">每次采集开一条 job，记录起止、统计、错误。</p>
+        <div class="lbl task">◇ 子任务</div><ul class="subtasks"><li>job 开始/结束写库；stats 含发现/新增/失败数</li></ul>
+        <div class="box acc"><b>✓ 验收</b><ul><li>每次采集恰一条 job；含正确 stats 与最终 status</li></ul></div>
+        <div class="box test"><b>⚙ 自测</b><ul><li>pytest：跑一次采集，断言 job.stats.new == 实际新增</li></ul></div>
+      </div></div>
+
+      <div class="feat"><div class="fh"><span class="fid">F2.3</span><span class="ft">任务锁与去重执行</span><span class="eff">0.5d</span></div><div class="fb">
+        <p class="fdesc">同一源不并发采集（Redis 锁），避免重复抓取。</p>
+        <div class="lbl task">◇ 子任务</div><ul class="subtasks"><li>采集前取 <code>lock:source:{id}</code>，持有期内拒绝重复入队执行</li></ul>
+        <div class="box acc"><b>✓ 验收</b><ul><li>并发触发同源采集，只有一个执行，其余快速跳过</li></ul></div>
+        <div class="box test"><b>⚙ 自测</b><ul><li>pytest：并发入队 3 个同源任务，断言只 1 个真正执行</li></ul></div>
+      </div></div>
+
+      <div class="feat"><div class="fh"><span class="fid">F2.4</span><span class="ft">抓取礼貌（限速/robots/退避）</span><span class="eff">1d</span><span class="pri p-should">SHOULD</span></div><div class="fb">
+        <p class="fdesc">遵守 robots、源级限速与并发上限、失败指数退避。</p>
+        <div class="lbl task">◇ 子任务</div><ul class="subtasks"><li>读取/缓存 robots.txt；尊重 disallow</li><li>源级令牌桶限速 + 并发上限</li><li>失败指数退避重试</li></ul>
+        <div class="box acc"><b>✓ 验收</b><ul><li>被 robots 禁止的路径不抓；超速请求被节流；失败按退避重试</li></ul></div>
+        <div class="box test"><b>⚙ 自测</b><ul><li>pytest：mock robots disallow，断言跳过；高频请求断言间隔≥阈值</li></ul></div>
+      </div></div>
+    </section>
+
+    <!-- E3 -->
+    <section id="e3">
+      <h2><span class="x">E3</span>RSS 采集 <span class="pri p-must">MUST</span></h2>
+      <div class="feat"><div class="fh"><span class="fid">F3.1</span><span class="ft">RSS 解析与抓取</span><span class="eff">1d</span></div><div class="fb">
+        <p class="fdesc">用 feedparser 拉取并解析 feed，得到条目列表。</p>
+        <div class="lbl task">◇ 子任务</div><ul class="subtasks"><li>httpx 拉 feed（带 ETag/Last-Modified 增量）</li><li>feedparser 解析为标准条目（title/link/published/author/summary）</li><li>容错：畸形 feed 不崩，记录到 job.error</li></ul>
+        <div class="box acc"><b>✓ 验收</b><ul><li>正常 feed 解析出全部条目；畸形 feed 不致命、job 标记失败</li><li>支持 ETag 增量，未变更返回 304 不重复处理</li></ul></div>
+        <div class="box test"><b>⚙ 自测</b><ul><li>pytest：用本地样例 RSS（含正常/畸形/空）断言解析结果</li><li>mock 304 响应，断言跳过</li></ul></div>
+      </div></div>
+
+      <div class="feat"><div class="fh"><span class="fid">F3.2</span><span class="ft">原始 entry 保存</span><span class="eff">0.5d</span></div><div class="fb">
+        <p class="fdesc">把每条 RSS 原始字段完整存入 <code>raw_documents.raw_entry</code>（jsonb，全量不裁剪）。</p>
+        <div class="lbl task">◇ 子任务</div><ul class="subtasks"><li>原始 entry 原样落 raw_entry；记录 url/fetch_method=rss/fetched_at</li></ul>
+        <div class="box acc"><b>✓ 验收</b><ul><li>raw_entry 含源条目全部字段，可还原；不丢任何信息</li></ul></div>
+        <div class="box test"><b>⚙ 自测</b><ul><li>pytest：断言 raw_entry 反序列化后字段集 ⊇ feedparser 输出关键字段</li></ul></div>
+      </div></div>
+
+      <div class="feat"><div class="fh"><span class="fid">F3.3</span><span class="ft">增量发现（新 vs 已见）</span><span class="eff">0.5d</span></div><div class="fb">
+        <p class="fdesc">仅对未见过的链接走后续全文抓取，已见的跳过。</p>
+        <div class="lbl task">◇ 子任务</div><ul class="subtasks"><li>按 url_hash 判断是否已存在 content_item</li><li>新链接入队全文抓取（E4）；已见仅检查更新（E6）</li></ul>
+        <div class="box acc"><b>✓ 验收</b><ul><li>重复拉取同 feed 不重复创建实体；只新增真正的新条目</li></ul></div>
+        <div class="box test"><b>⚙ 自测</b><ul><li>pytest：连拉两次同 feed，断言第二次 new=0</li></ul></div>
+      </div></div>
+    </section>
+
+    <!-- E4 -->
+    <section id="e4">
+      <h2><span class="x">E4</span>网页全文抓取 <span class="pri p-must">MUST</span></h2>
+      <div class="feat"><div class="fh"><span class="fid">F4.1</span><span class="ft">抓取器（静态 + 渲染）</span><span class="eff">1.5d</span></div><div class="fb">
+        <p class="fdesc">优先 httpx 静态抓取；需要 JS 渲染的源用 Playwright。</p>
+        <div class="lbl task">◇ 子任务</div><ul class="subtasks"><li>httpx 抓 HTML；按 crawl_config.render 决定是否走 Playwright</li><li>Playwright 池化（复用浏览器上下文）控资源</li><li>记录 http_status/headers/耗时</li></ul>
+        <div class="box acc"><b>✓ 验收</b><ul><li>静态站正常抓；JS 站经渲染拿到完整 DOM；超时/失败有明确错误</li></ul></div>
+        <div class="box test"><b>⚙ 自测</b><ul><li>pytest：本地起静态页与 JS 注入页，断言两者都拿到目标文本</li></ul></div>
+      </div></div>
+
+      <div class="feat"><div class="fh"><span class="fid">F4.2</span><span class="ft">原始 HTML 入对象存储</span><span class="eff">0.5d</span></div><div class="fb">
+        <p class="fdesc">完整原始 HTML 存对象存储，库里记 ref + sha256（不可变原始层）。</p>
+        <div class="lbl task">◇ 子任务</div><ul class="subtasks"><li>计算 sha256；put 到 <code>raw/{source}/{sha256}.html</code></li><li>写 raw_documents(raw_html_ref, raw_html_sha256, http_*)</li></ul>
+        <div class="box acc"><b>✓ 验收</b><ul><li>原文可由 ref 取回且 sha256 校验通过；相同内容不重复存储</li></ul></div>
+        <div class="box test"><b>⚙ 自测</b><ul><li>pytest：抓取→取回，断言 sha256 一致；同内容二次抓取命中已存 key</li></ul></div>
+      </div></div>
+
+      <div class="feat"><div class="fh"><span class="fid">F4.3</span><span class="ft">正文提取与置信度</span><span class="eff">1.5d</span></div><div class="fb">
+        <p class="fdesc">trafilatura/readability 提取正文与元数据，给出置信度。</p>
+        <div class="lbl task">◇ 子任务</div><ul class="subtasks"><li>提取 title/author/正文/发布时间</li><li>置信度评分；低于阈值标记进人工/重试队列（原文仍保留）</li><li>清洗正文存对象存储（clean_text_ref）</li></ul>
+        <div class="box acc"><b>✓ 验收</b><ul><li>主流技术博客正文提取完整（无导航/广告残留）</li><li>低置信样本被正确标记，不污染规范层</li></ul></div>
+        <div class="box test"><b>⚙ 自测</b><ul><li>pytest：固定 10 个样例页，断言正文包含关键段、不含导航词</li><li>金标对比：人工标注正文 vs 提取结果的覆盖率≥阈值</li></ul></div>
+      </div></div>
+
+      <div class="feat"><div class="fh"><span class="fid">F4.4</span><span class="ft">失败处理与重试</span><span class="eff">0.5d</span></div><div class="fb">
+        <p class="fdesc">抓取失败也要留痕（raw_documents 记录错误），可重试，不阻塞其他。</p>
+        <div class="lbl task">◇ 子任务</div><ul class="subtasks"><li>失败写 raw_documents(http_status/extra.error)；指数退避重试</li><li>多次失败标记并跳过，记入 job</li></ul>
+        <div class="box acc"><b>✓ 验收</b><ul><li>单条失败不影响同批其他条目；失败有完整错误留痕可排查</li></ul></div>
+        <div class="box test"><b>⚙ 自测</b><ul><li>pytest：mock 500/超时，断言重试次数与最终留痕</li></ul></div>
+      </div></div>
+    </section>
+
+    <!-- E5 -->
+    <section id="e5">
+      <h2><span class="x">E5</span>去重与规范化 <span class="pri p-must">MUST</span></h2>
+      <div class="feat"><div class="fh"><span class="fid">F5.1</span><span class="ft">指纹计算</span><span class="eff">1d</span></div><div class="fb">
+        <p class="fdesc">url_hash（规范化 URL）、content_hash（正文 sha256）、simhash（近似）。</p>
+        <div class="lbl task">◇ 子任务</div><ul class="subtasks"><li>URL 规范化（去 utm、统一大小写/斜杠）→ url_hash</li><li>正文 content_hash；simhash 计算</li></ul>
+        <div class="box acc"><b>✓ 验收</b><ul><li>同一文章不同 utm 参数得相同 url_hash；正文微调 simhash 邻近</li></ul></div>
+        <div class="box test"><b>⚙ 自测</b><ul><li>pytest：构造带/不带 utm 的 URL 断言 url_hash 相同；近似文本断言 simhash 海明距离小</li></ul></div>
+      </div></div>
+
+      <div class="feat"><div class="fh"><span class="fid">F5.2</span><span class="ft">去重判定（新/重复/变体）</span><span class="eff">1d</span></div><div class="fb">
+        <p class="fdesc">判定一条抓取是全新、完全重复、还是近似变体（多源转载）。</p>
+        <div class="lbl task">◇ 子任务</div><ul class="subtasks"><li>url_hash 命中 → 同一实体（走更新/版本）</li><li>content_hash 命中（不同 URL）→ 转载变体，关联但保留</li><li>simhash 邻近 → 标近似，选代表</li></ul>
+        <div class="box acc"><b>✓ 验收</b><ul><li>转载内容不重复进入规范层"代表"，但<b>原始抓取各自留痕</b></li><li>判定结果可解释（记录命中类型）</li></ul></div>
+        <div class="box test"><b>⚙ 自测</b><ul><li>pytest：同文 3 个不同来源，断言 1 个代表 content_item + 3 条 raw_documents</li></ul></div>
+      </div></div>
+
+      <div class="feat"><div class="fh"><span class="fid">F5.3</span><span class="ft">ContentItem 规范化建立</span><span class="eff">1d</span></div><div class="fb">
+        <p class="fdesc">从原始抓取派生规范化 content_item，状态置 <code>WAIT_FILTER</code>，绑定 raw_document。</p>
+        <div class="lbl task">◇ 子任务</div><ul class="subtasks"><li>写 content_items（含 url_hash/hashes/clean_text_ref/raw_document_id）</li><li>状态机：仅允许 → WAIT_FILTER 初始态</li><li>语言识别填 lang</li></ul>
+        <div class="box acc"><b>✓ 验收</b><ul><li>新内容生成恰一条 content_item(status=WAIT_FILTER)，可溯源到 raw_document</li><li>url_hash 唯一约束生效</li></ul></div>
+        <div class="box test"><b>⚙ 自测</b><ul><li>pytest：端到端"抓取→规范化"，断言实体字段齐全且状态正确</li></ul></div>
+      </div></div>
+    </section>
+
+    <!-- E6 -->
+    <section id="e6">
+      <h2><span class="x">E6</span>原始层与版本 <span class="pri p-must">MUST</span> / <span class="pri p-should">SHOULD</span></h2>
+      <div class="feat"><div class="fh"><span class="fid">F6.1</span><span class="ft">原始层不可变写入</span><span class="eff">0.5d</span><span class="pri p-must">MUST</span></div><div class="fb">
+        <p class="fdesc">raw_documents 只追加不修改；任何抓取（含失败）都留一条。</p>
+        <div class="lbl task">◇ 子任务</div><ul class="subtasks"><li>所有抓取路径统一经 <code>RawStore.append()</code></li><li>禁止 update/delete raw_documents（仓储层不暴露）</li></ul>
+        <div class="box acc"><b>✓ 验收</b><ul><li>每次抓取产生一条不可变 raw_document；无任何更新/删除路径</li></ul></div>
+        <div class="box test"><b>⚙ 自测</b><ul><li>代码审查 + 测试：仓储无 update/delete 方法；多次抓取累加记录</li></ul></div>
+      </div></div>
+
+      <div class="feat"><div class="fh"><span class="fid">F6.2</span><span class="ft">变更检测与版本</span><span class="eff">1d</span><span class="pri p-should">SHOULD</span></div><div class="fb">
+        <p class="fdesc">已存在内容再次抓取时，content_hash 变化则新增 version，旧版保留。</p>
+        <div class="lbl task">◇ 子任务</div><ul class="subtasks"><li>对比新旧 content_hash；变化则写 content_versions(version+1)</li><li>更新 content_items.current_version 与 raw_document_id</li><li>记 diff_summary（长度/标题变化等）</li></ul>
+        <div class="box acc"><b>✓ 验收</b><ul><li>内容更新产生新版本行，历史版本与其原文全部可查</li><li>内容未变不产生新版本</li></ul></div>
+        <div class="box test"><b>⚙ 自测</b><ul><li>pytest：抓同 URL 两次（内容改/不改），断言版本数符合预期</li></ul></div>
+      </div></div>
+
+      <div class="feat"><div class="fh"><span class="fid">F6.3</span><span class="ft">血缘与可重放</span><span class="eff">1d</span><span class="pri p-should">SHOULD</span></div><div class="fb">
+        <p class="fdesc">content_item→raw_document→crawl_job→source 全链可溯；支持从原始层重建规范层。</p>
+        <div class="lbl task">◇ 子任务</div><ul class="subtasks"><li>提供 <code>lineage(content_id)</code> 返回全链</li><li><code>rebuild_canonical(content_id)</code>：从 raw 重新提取并更新规范层</li></ul>
+        <div class="box acc"><b>✓ 验收</b><ul><li>任一 content_item 可溯源到原始抓取与源</li><li>删除规范层后能从原始层重建（不需重新抓取外部）</li></ul></div>
+        <div class="box test"><b>⚙ 自测</b><ul><li>pytest：清空 content_items，调 rebuild 从 raw 重建，断言恢复一致</li></ul></div>
+      </div></div>
+    </section>
+
+    <!-- E7 -->
+    <section id="e7">
+      <h2><span class="x">E7</span>事件与契约 <span class="pri p-must">MUST</span></h2>
+      <div class="feat"><div class="fh"><span class="fid">F7.1</span><span class="ft">content.ingested 事件（outbox）</span><span class="eff">1d</span></div><div class="fb">
+        <p class="fdesc">新内容入库时，事务内写 outbox，独立 relay 进程发布到队列，保证不丢。</p>
+        <div class="lbl task">◇ 子任务</div><ul class="subtasks"><li>建实体与写 outbox 在同一事务</li><li>relay 轮询 published_at 为空的事件 → 投递 → 标记已发</li><li>事件载荷：<code>{content_id, source_id, lang}</code></li></ul>
+        <div class="box acc"><b>✓ 验收</b><ul><li>每条新内容恰发一次 content.ingested；进程崩溃重启不丢、不重复（至少一次+幂等键）</li></ul></div>
+        <div class="box test"><b>⚙ 自测</b><ul><li>pytest：建内容后断言 outbox 有记录；跑 relay 断言已投递并标记</li><li>故障注入：投递后崩溃前未标记，重启后幂等不重复消费</li></ul></div>
+      </div></div>
+
+      <div class="feat"><div class="fh"><span class="fid">F7.2</span><span class="ft">内部查询 API（供 L1）</span><span class="eff">1d</span></div><div class="fb">
+        <p class="fdesc">L1 拉取待加工内容与详情（含原文指针）。</p>
+        <div class="lbl task">◇ 子任务</div><ul class="subtasks"><li><code>list_contents(status, since, limit, cursor)</code></li><li><code>get_content(id)</code> 返回稳定字段 + clean_text 取回</li><li>稳定契约：id/canonical_url/title/clean_text/lang/source/published_at/status</li></ul>
+        <div class="box acc"><b>✓ 验收</b><ul><li>按 WAIT_FILTER 分页拉取稳定有序、无重无漏；契约字段齐全</li></ul></div>
+        <div class="box test"><b>⚙ 自测</b><ul><li>pytest：插 N 条，分页遍历断言总数=N 且无重复 id</li><li>契约测试：响应 schema 校验（pydantic 模型）</li></ul></div>
+      </div></div>
+
+      <div class="feat"><div class="fh"><span class="fid">F7.3</span><span class="ft">重放接口</span><span class="eff">0.5d</span><span class="pri p-should">SHOULD</span></div><div class="fb">
+        <p class="fdesc">按范围触发 content.reprocess，驱动上层对历史内容重新加工。</p>
+        <div class="lbl task">◇ 子任务</div><ul class="subtasks"><li><code>reprocess(scope: source/time/all, target_layer)</code> → 批量发事件</li></ul>
+        <div class="box acc"><b>✓ 验收</b><ul><li>指定范围内容全部发出 reprocess 事件，数量与范围匹配</li></ul></div>
+        <div class="box test"><b>⚙ 自测</b><ul><li>pytest：对某源触发，断言事件数=该源 content 数</li></ul></div>
+      </div></div>
+    </section>
+
+    <!-- E8 -->
+    <section id="e8">
+      <h2><span class="x">E8</span>媒体抓取（后置）<span class="pri p-should">SHOULD</span></h2>
+      <div class="feat"><div class="fh"><span class="fid">F8.1</span><span class="ft">封面/图片抓取</span><span class="eff">0.5d</span></div><div class="fb">
+        <p class="fdesc">抓取封面与关键图片存对象存储，记入 media_refs。</p>
+        <div class="box acc"><b>✓ 验收</b><ul><li>封面图可取回；media_refs 指向有效对象</li></ul></div>
+        <div class="box test"><b>⚙ 自测</b><ul><li>pytest：含图样例页，断言 media_refs 非空且可取回</li></ul></div>
+      </div></div>
+      <div class="feat"><div class="fh"><span class="fid">F8.2</span><span class="ft">播客音频下载</span><span class="eff">1d</span></div><div class="fb">
+        <p class="fdesc">播客 enclosure 音频下载存储（转写在 L1）。</p>
+        <div class="box acc"><b>✓ 验收</b><ul><li>音频文件完整下载、可取回；大小校验通过</li></ul></div>
+        <div class="box test"><b>⚙ 自测</b><ul><li>pytest：mock enclosure，断言下载字节数与 Content-Length 一致</li></ul></div>
+      </div></div>
+    </section>
+
+    <!-- test strategy -->
+    <section id="teststrategy">
+      <h2><span class="x">✓</span>测试策略</h2>
+      <div class="grid3">
+        <div class="card"><h3 style="margin-top:0">单元测试</h3><ul class="clean"><li>纯函数：URL 规范化、hash、simhash、OPML 解析、正文提取</li><li>快、无外部依赖，mock IO</li><li>目标覆盖率 ≥ 80%（core_data）</li></ul></div>
+        <div class="card"><h3 style="margin-top:0">集成测试</h3><ul class="clean"><li>testcontainers 起真 <b>PG/Redis/MinIO</b></li><li>迁移、仓储、队列、对象存储往返</li><li>事件 outbox 投递与幂等</li></ul></div>
+        <div class="card"><h3 style="margin-top:0">端到端 / 数据质量</h3><ul class="clean"><li>固定样例源（本地 RSS+HTML fixtures）跑全链路</li><li>正文提取金标对比（覆盖率阈值）</li><li>去重场景（转载/变体）断言</li></ul></div>
+      </div>
+      <pre><span class="c"># fixtures 目录</span>
+tests/fixtures/
+  rss/{normal,malformed,empty}.xml
+  html/{static,js_rendered,with_ads}.html
+  opml/sample.opml
+  golden/{slug}.txt        <span class="c"># 正文金标</span>
+<span class="c"># 运行</span>
+uv run pytest -m "unit"            <span class="c"># 快</span>
+uv run pytest -m "integration"     <span class="c"># 起容器</span>
+uv run pytest --cov=core_data</pre>
+      <div class="callout"><b>CI 门禁：</b>PR 必须通过 ruff + mypy + 单元 + 集成测试；覆盖率不达标阻断合并。每个 Feature 的"自测"用例并入回归集。</div>
+    </section>
+
+    <section id="dod">
+      <h2><span class="x">★</span>L0 总验收（Definition of Done）</h2>
+      <div class="card">
+        <ul class="clean">
+          <li><strong>采集</strong>：导入 OPML → 定时拉 RSS → 全文抓取，全链自动运行 ≥ 24h 无人工干预</li>
+          <li><strong>全量保存</strong>：每条内容的原始 entry / 原始 HTML / 抓取元数据完整留存，可取回校验</li>
+          <li><strong>规范化</strong>：content_items 状态正确（WAIT_FILTER），可溯源到 raw_document</li>
+          <li><strong>去重</strong>：转载/重复正确处理，原始层不丢变体</li>
+          <li><strong>版本</strong>：内容更新产生新版本，历史可查</li>
+          <li><strong>事件</strong>：content.ingested 不丢不重，L1 能稳定拉取</li>
+          <li><strong>可重放</strong>：能从原始层重建规范层，无需重抓外部</li>
+          <li><strong>质量</strong>：覆盖率达标，CI 全绿，/healthz 正常</li>
+          <li><strong>可观测</strong>：每次采集有 job 记录与指标（覆盖率/成功率/去重率）</li>
+        </ul>
+      </div>
+      <div class="callout green"><b>达成即代表：</b>L0 可作为独立、可信、可重放的数据底座，正式向 L1 供数。此时启动 L1 开发 Plan。</div>
+    </section>
+
+    <section id="risk">
+      <h2><span class="x">!</span>风险与依赖</h2>
+      <table>
+        <thead><tr><th>风险/依赖</th><th>应对</th></tr></thead>
+        <tbody>
+          <tr><td>JS 站点/反爬导致抓取失败</td><td>Playwright 渲染 + 代理（后置）+ 退避；失败留痕不阻塞</td></tr>
+          <tr><td>正文提取准确率不达标</td><td>多提取器投票 + 置信度 + 金标回归；保留原始 HTML 可重提</td></tr>
+          <tr><td>存储成本随全量保存上升</td><td>大块进对象存储 + 压缩；冷数据分层（V1）；不删原始</td></tr>
+          <tr><td>事件丢失/重复</td><td>事务性 outbox + 幂等键（至少一次 + 上层幂等消费）</td></tr>
+          <tr><td>外部依赖（PG/Redis/MinIO）</td><td>本地 docker-compose 一键起；CI 用 testcontainers</td></tr>
+        </tbody>
+      </table>
+      <div class="callout"><b>下一步：</b>L0 通过 DoD 后，按同样粒度产出 <b>L1 数据加工开发 Plan</b>（含 LangGraph 基础分析图的功能拆解与自测）。</div>
+    </section>
+
+    <div class="foot">L0 数据底座 · 详尽开发 Plan · 9 EPIC / ~35 小功能 / 含验收与自测 · CodePick 分层平台 · 2026-05-30</div>
+  </main>
+</div>
+</body>
+</html>

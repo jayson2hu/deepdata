@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L0 数据底座 · 架构设计</title>
+<style>
+  :root{--bg:#08141a;--panel:#0f1f28;--panel2:#162a35;--line:#1f3b48;--text:#e6f4f8;--muted:#92b3bf;--dim:#5f8593;--acc:#22d3ee;--acc2:#67e8f9;--green:#34d399;--amber:#fbbf24;--rose:#fb7185;--violet:#a78bfa;--ye:#fcd34d}
+  *{box-sizing:border-box}html{scroll-behavior:smooth}
+  body{margin:0;background:radial-gradient(900px 480px at 82% -12%,rgba(34,211,238,.09),transparent),var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;line-height:1.7;font-size:15px}
+  a{color:var(--acc)}.wrap{display:grid;grid-template-columns:244px 1fr;max-width:1320px;margin:0 auto}
+  nav{position:sticky;top:0;height:100vh;overflow-y:auto;padding:24px 14px;border-right:1px solid var(--line);background:rgba(8,20,26,.72)}
+  nav .bk{display:inline-block;font-size:10px;font-weight:800;letter-spacing:1px;color:#06121a;background:var(--acc);padding:3px 9px;border-radius:6px;margin-bottom:8px}
+  nav .brand{font-weight:800;font-size:15px}nav .sub{color:var(--dim);font-size:11px;margin-bottom:14px}
+  nav a{display:block;color:var(--muted);padding:5.5px 11px;border-radius:8px;font-size:12.5px}
+  nav a:hover{background:var(--panel);color:var(--text);text-decoration:none}
+  main{padding:38px 50px 110px;min-width:0}
+  .tag{display:inline-block;background:rgba(34,211,238,.13);color:var(--acc);border:1px solid rgba(34,211,238,.32);padding:4px 12px;border-radius:999px;font-size:12.5px;font-weight:700;margin-bottom:12px}
+  h1{font-size:28px;line-height:1.25;margin:0 0 10px;font-weight:800}h1 em{font-style:normal;background:linear-gradient(90deg,var(--acc),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lede{color:var(--muted);font-size:15.5px;max-width:820px}
+  section{margin:38px 0;scroll-margin-top:14px}
+  h2{font-size:20px;margin:0 0 6px;font-weight:800;display:flex;align-items:center;gap:10px;padding-bottom:7px;border-bottom:1px solid var(--line)}
+  h2 .x{background:linear-gradient(135deg,var(--acc),#0891b2);color:#06121a;width:25px;height:25px;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:800;flex-shrink:0}
+  h3{font-size:15px;margin:18px 0 7px;color:#fff}
+  .note{color:var(--dim);font-size:12.5px;margin-bottom:12px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:12px 0}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .mini{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:14px}.mini h4{margin:0 0 5px;font-size:13.6px;color:#fff}.mini p{margin:0;color:var(--muted);font-size:12.2px}.mini .ic{font-size:17px;margin-bottom:4px;display:block}
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:12.4px;border-radius:10px;overflow:hidden}
+  th,td{padding:9px 11px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}th{background:var(--panel2);color:#fff;font-weight:700}td{color:var(--muted)}tr:last-child td{border-bottom:none}td strong{color:var(--text)}
+  .hl{color:var(--acc);font-weight:700}
+  pre{background:#061018;border:1px solid var(--line);border-radius:11px;padding:14px 16px;overflow-x:auto;font-size:11.8px;line-height:1.55;color:#bcd4dd;margin:12px 0}
+  pre .c{color:#557281}pre .cy{color:#67e8f9}pre .gr{color:#6ee7b7}pre .ye{color:#fcd34d}pre .vi{color:#c4b5fd}pre .pk{color:#f9a8d4}
+  code{background:var(--panel2);padding:1.5px 6px;border-radius:5px;font-size:12px;color:var(--violet);font-family:Consolas,monospace}
+  ul.clean{margin:8px 0;padding-left:19px}ul.clean li{margin:4px 0;color:var(--muted)}ul.clean li strong{color:var(--text)}
+  .callout{border-left:3px solid var(--acc);background:rgba(34,211,238,.07);padding:12px 16px;border-radius:0 10px 10px 0;margin:12px 0;color:var(--muted)}.callout.amber{border-color:var(--amber);background:rgba(251,191,36,.07)}.callout.green{border-color:var(--green);background:rgba(52,211,153,.07)}.callout b{color:var(--text)}
+  .seq{counter-reset:s;margin:12px 0}.seq .r{display:flex;gap:11px;padding:7px 0;border-bottom:1px dashed var(--line)}.seq .r:last-child{border-bottom:none}
+  .seq .r::before{counter-increment:s;content:counter(s);flex-shrink:0;width:21px;height:21px;border-radius:6px;background:var(--panel2);color:var(--acc);font-weight:700;font-size:11px;display:flex;align-items:center;justify-content:center}.seq .r div{font-size:12.6px;color:var(--muted)}.seq .r b{color:var(--text)}
+  .foot{margin-top:46px;padding-top:16px;border-top:1px solid var(--line);color:var(--dim);font-size:12px}
+  @media(max-width:980px){.wrap{grid-template-columns:1fr}nav{display:none}main{padding:22px 15px 60px}.grid2,.grid3{grid-template-columns:1fr}h1{font-size:22px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <span class="bk">LAYER 0</span>
+    <div class="brand">数据底座</div>
+    <div class="sub">架构设计 · Data Foundation</div>
+    <a href="#goal">① 设计目标</a>
+    <a href="#comp">② 组件架构</a>
+    <a href="#tiers">③ 三段存储模型</a>
+    <a href="#model">④ 数据模型(深化)</a>
+    <a href="#dedup">⑤ 去重策略</a>
+    <a href="#replay">⑥ 可重放与血缘</a>
+    <a href="#version">⑦ 版本与变更</a>
+    <a href="#contract">⑧ 接口契约</a>
+    <a href="#flow">⑨ 采集时序</a>
+    <a href="#tech">⑩ 技术选型</a>
+    <a href="#deploy">⑪ 部署</a>
+    <a href="#considerations">⑫ 重点考量</a>
+    <a href="#risk">⑬ 风险</a>
+  </nav>
+  <main>
+    <span class="tag">分层产品 1 / 4 · 架构设计</span>
+    <h1>L0 数据底座 — <em>架构设计</em></h1>
+    <p class="lede">本文聚焦"如何把数据尽可能完整地采进来、不可变地存下去、并能驱动上层重放"。核心设计是<b>三段式存储（原始层 / 规范层 / 索引层）</b>与<b>可重放的血缘体系</b>。</p>
+
+    <section id="goal">
+      <h2><span class="x">1</span>设计目标</h2>
+      <div class="grid3">
+        <div class="mini"><span class="ic">🗃️</span><h4>零丢失</h4><p>原始数据不可变、只追加，永不覆盖删除。</p></div>
+        <div class="mini"><span class="ic">♻️</span><h4>可重放</h4><p>上层升级可从原始层重跑，无需重抓外部源。</p></div>
+        <div class="mini"><span class="ic">🧬</span><h4>可追溯</h4><p>每条规范化数据都能溯源到原始抓取。</p></div>
+        <div class="mini"><span class="ic">🧩</span><h4>可扩展字段</h4><p>未知/新字段用 jsonb 先存，schema-on-read。</p></div>
+        <div class="mini"><span class="ic">💰</span><h4>成本可控</h4><p>大块原文进对象存储，库存指针与元数据。</p></div>
+        <div class="mini"><span class="ic">🔌</span><h4>稳定契约</h4><p>对上层暴露稳定字段与事件，内部实现可换。</p></div>
+      </div>
+    </section>
+
+    <section id="comp">
+      <h2><span class="x">2</span>组件架构</h2>
+      <pre><span class="c">                    ┌──────────────────────────────────────────────┐
+ 外部源 ───────────▶│  Source Registry  源注册表 + 抓取配置          │
+ (RSS/网页/         └───────────────┬──────────────────────────────┘
+  播客/X)                           │ 调度
+                    ┌───────────────▼──────────────────────────────┐
+                    │  Scheduler 调度器 (Arq/Celery beat)           │
+                    └───────┬───────────────┬──────────────┬────────┘
+                            ▼               ▼              ▼
+                    ┌────────────┐  ┌────────────┐  ┌────────────┐
+                    │ RSS Poller │  │ Web Fetcher│  │Media Fetcher│
+                    │ feedparser │  │ Playwright │  │ (音频/图)   │
+                    └─────┬──────┘  └─────┬──────┘  └─────┬──────┘
+                          └──────────┬────┴───────────────┘
+                                     ▼
+                    ┌────────────────────────────────────┐
+                    │ Extractor 正文提取 + 规范化           │
+                    │ Dedup 去重(url/content/simhash)      │
+                    └───────────────┬─────────────────────┘
+            ┌──────────────────────┼───────────────────────┐
+            ▼                      ▼                       ▼
+   </span><span class="cy">① RAW STORE</span><span class="c">          </span><span class="gr">② CANONICAL STORE</span><span class="c">      </span><span class="ye">③ INDEX</span><span class="c">
+   对象存储+raw_documents    content_items+versions   dedup索引/源健康
+            └──────────────────────┴───────────────────────┘
+                                     │ 发事件 content.ingested
+                                     ▼  →→→ 上层 L1</span></pre>
+    </section>
+
+    <section id="tiers">
+      <h2><span class="x">3</span>三段式存储模型（核心）</h2>
+      <div class="grid3">
+        <div class="card"><h3 style="margin-top:0"><span class="hl">① 原始层 RAW</span></h3><p style="color:var(--muted);font-size:12.6px">不可变、只追加。保存源头原始条目、原始 HTML、HTTP 头、抓取快照、媒体二进制。大块进对象存储，库里存指针+校验和。<b>这是可重放与零丢失的根基。</b></p></div>
+        <div class="card"><h3 style="margin-top:0"><span style="color:var(--green)">② 规范层 CANONICAL</span></h3><p style="color:var(--muted);font-size:12.6px">从原始层派生的统一 ContentItem：清洗正文、标题、作者、语言、发布时间、状态。<b>上层主要消费这层</b>，可被重放重建。</p></div>
+        <div class="card"><h3 style="margin-top:0"><span style="color:var(--ye)">③ 索引层 INDEX</span></h3><p style="color:var(--muted);font-size:12.6px">去重指纹、源健康、抓取日志等运维/查询辅助。可重建，不含真相。</p></div>
+      </div>
+      <div class="callout green"><b>为什么分三段：</b>原始层保证"存全不丢"，规范层保证"上层好用"，索引层保证"查得快、管得住"。<b>派生层(②③)永远能从原始层(①)重建</b>，所以即便规范化逻辑出错，原始数据仍在，可重跑修复。</div>
+    </section>
+
+    <section id="model">
+      <h2><span class="x">4</span>数据模型（深化）</h2>
+      <pre><span class="cy">-- ① 原始层（不可变，只追加）</span>
+<span class="vi">raw_documents</span>(
+  id, source_id, fetch_job_id,
+  url, http_status, http_headers jsonb, fetched_at, fetch_method <span class="c">[rss|browser|api]</span>,
+  raw_entry jsonb,            <span class="c">-- 源头原始条目(RSS/API 全字段)</span>
+  raw_html_ref,               <span class="c">-- 对象存储指针(完整原文)</span>
+  raw_html_sha256,            <span class="c">-- 校验和(完整性/去重)</span>
+  media_refs jsonb,           <span class="c">-- 封面/音频/图片 对象存储指针[]</span>
+  extra jsonb )               <span class="c">-- 任何额外/未知字段，先存下来</span>
+
+<span class="gr">-- ② 规范层（派生，可重建，上层主消费）</span>
+<span class="vi">content_items</span>(
+  id, canonical_url, url_hash <span class="ye">UNIQUE</span>, content_hash, simhash,
+  title, author, clean_text_ref, lang,
+  source_id, published_at, fetched_at,
+  current_version int, raw_document_id <span class="c">→ 溯源到原始层</span>,
+  status <span class="c">[WAIT_FILTER|...|COMPLETED|CANCELLED]</span>,
+  meta jsonb )                <span class="c">-- 规范化的扩展字段</span>
+
+<span class="vi">content_versions</span>(           <span class="c">-- 同 URL 内容更新的历史版本</span>
+  id, content_id, version int, raw_document_id, clean_text_ref,
+  diff_summary, detected_at )
+
+<span class="ye">-- ③ 索引/运维层（可重建）</span>
+<span class="vi">sources</span>(id, name, feed_url, type, crawl_config jsonb, is_public,
+        owner_user_id?, vertical_codes[], etiquette jsonb)
+<span class="vi">source_health</span>(source_id, last_ok_at, fail_count, empty_streak, status)
+<span class="vi">crawl_jobs</span>(id, source_id, started_at, finished_at, stats jsonb, status)
+<span class="vi">dedup_index</span>(url_hash, content_hash, simhash_bucket, content_id)</pre>
+      <div class="callout"><b>关键点：</b><code>content_items</code> 通过 <code>raw_document_id</code> 永远指回原始层；大文本/二进制只存<b>对象存储指针 + sha256</b>，库表保持轻量可查。<code>extra/meta jsonb</code> 接住一切未预料字段——<b>先存，后定义</b>。</div>
+    </section>
+
+    <section id="dedup">
+      <h2><span class="x">5</span>去重策略（去重但保留变体）</h2>
+      <table>
+        <thead><tr><th>层级</th><th>指纹</th><th>处理</th></tr></thead>
+        <tbody>
+          <tr><td>同一 URL</td><td><code>url_hash</code></td><td>规范层合并为同一 content_item；内容若变 → 新 version</td></tr>
+          <tr><td>完全相同正文</td><td><code>content_hash (sha256)</code></td><td>判定完全重复；但<b>原始抓取仍各自留痕</b>(多源转载)</td></tr>
+          <tr><td>近似内容</td><td><code>simhash</code></td><td>近重复聚类；保留代表 + 关联变体，不丢弃</td></tr>
+        </tbody>
+      </table>
+      <div class="callout amber"><b>原则：</b>去重是为"上层不重复处理与展示"，<b>不是为了删数据</b>。原始层永远保留每一次抓取（含转载变体），去重只发生在规范层的"代表选择"上。</div>
+    </section>
+
+    <section id="replay">
+      <h2><span class="x">6</span>可重放与血缘</h2>
+      <ul class="clean">
+        <li><strong>血缘 (lineage)</strong>：<code>content_item → raw_document → crawl_job → source</code> 全链路可溯源。</li>
+        <li><strong>重放 (replay)</strong>：当 L1 摘要逻辑 / L2 评分 rubric 升级，触发"重处理"——从原始层读 raw_html，重建规范层与上层产物，无需重新抓外部源。</li>
+        <li><strong>重放接口</strong>：<code>POST 重处理(范围: 源/时间/全部, 目标层: L1/L2)</code> → 发 <code>content.reprocess</code> 事件给上层。</li>
+      </ul>
+      <div class="callout green"><b>这是 L0 最高价值的能力：</b>原始数据存全 + 可重放 = 上层算法每次升级都能"免费"作用于全部历史内容。没有完整原始层，这一切不可能。</div>
+    </section>
+
+    <section id="version">
+      <h2><span class="x">7</span>版本与变更检测</h2>
+      <p class="note">技术博客/文档常被更新。L0 用 <code>content_hash</code> 检测变更：内容变化时<b>新增 version 行</b>并更新 <code>current_version</code>，旧版本与其原始 HTML 全部保留。</p>
+    </section>
+
+    <section id="contract">
+      <h2><span class="x">8</span>对上层的接口契约</h2>
+      <pre><span class="gr"># 查询（供 L1 拉取待加工）</span>
+GET  internal/contents?status=WAIT_FILTER&since=&limit=
+GET  internal/contents/{id}        <span class="c"># 含 raw 指针、溯源</span>
+
+<span class="gr"># 事件（驱动上层）</span>
+EVENT content.ingested {content_id, source_id, lang}
+EVENT content.reprocess {content_id, target_layer}
+
+<span class="gr"># 稳定字段（对上层不变）</span>
+id · canonical_url · title · clean_text · lang · source · published_at · status</pre>
+    </section>
+
+    <section id="flow">
+      <h2><span class="x">9</span>采集时序</h2>
+      <div class="seq">
+        <div class="r"><div>Scheduler 按源 crawl_config 触发抓取任务（遵守 robots / 速率 / 礼貌间隔）</div></div>
+        <div class="r"><div>RSS Poller 取条目 / Web Fetcher 用 Playwright 渲染抓全文 → <b>原样写入 raw_documents + 对象存储</b></div></div>
+        <div class="r"><div>Extractor 提取正文与元数据 → 计算 url_hash/content_hash/simhash</div></div>
+        <div class="r"><div>Dedup：新内容建 content_item；已存在则比对 hash，变更则加 version</div></div>
+        <div class="r"><div>写规范层(status=WAIT_FILTER) + 索引层；更新 source_health</div></div>
+        <div class="r"><div>发 <code>content.ingested</code> 事件 → 驱动 L1</div></div>
+      </div>
+    </section>
+
+    <section id="tech">
+      <h2><span class="x">10</span>技术选型</h2>
+      <table>
+        <thead><tr><th>用途</th><th>选型</th></tr></thead>
+        <tbody>
+          <tr><td>语言/运行</td><td>Python（与全平台一致）</td></tr>
+          <tr><td>RSS</td><td>feedparser</td></tr>
+          <tr><td>网页抓取</td><td>Playwright（无头浏览器，渲染 JS 站点）+ trafilatura/readability 提取正文</td></tr>
+          <tr><td>调度/队列</td><td>Arq 或 Celery（Redis broker）</td></tr>
+          <tr><td>元数据库</td><td>PostgreSQL（raw_documents/content_items/...）</td></tr>
+          <tr><td>原文/媒体</td><td>S3 兼容对象存储（R2/S3/MinIO）</td></tr>
+          <tr><td>去重</td><td>url_hash(sha1) + content_hash(sha256) + simhash</td></tr>
+          <tr><td>ORM/迁移</td><td>SQLAlchemy 2.x + Alembic</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="deploy">
+      <h2><span class="x">11</span>部署</h2>
+      <p class="note">MVP：<code>ingestion-worker</code> 进程 + Playwright（同镜像或独立）+ PG + Redis + 对象存储。规模化：抓取 worker 水平扩展，按源分片；任务锁避免重复抓取。</p>
+    </section>
+
+    <section id="considerations">
+      <h2><span class="x">12</span>重点考量（你要求"多考虑点"）</h2>
+      <table>
+        <thead><tr><th>议题</th><th>设计取向</th></tr></thead>
+        <tbody>
+          <tr><td><strong>存全 vs 成本</strong></td><td>默认全存；大块进对象存储；冷数据转冷存储；不删原始</td></tr>
+          <tr><td><strong>原始 vs 规范分离</strong></td><td>原始不可变、只追加；规范可重建。两者强血缘绑定</td></tr>
+          <tr><td><strong>幂等</strong></td><td>抓取按 (source,url,content_hash) 幂等；重复不产生脏数据</td></tr>
+          <tr><td><strong>抓取礼貌</strong></td><td>遵守 robots、限速、退避、UA 标识；源级并发上限</td></tr>
+          <tr><td><strong>失败可恢复</strong></td><td>抓取失败留 raw 记录与错误；可重试；不阻塞其他源</td></tr>
+          <tr><td><strong>合规/版权</strong></td><td>规范层只供上层生成"摘要+链接"，不对外全文转载；标注来源</td></tr>
+          <tr><td><strong>Schema 演进</strong></td><td>jsonb 兜底未知字段；新字段先存后建模，避免丢信息</td></tr>
+          <tr><td><strong>数据质量</strong></td><td>正文提取置信度打分；低质量进人工/重抓队列（仍保留原始）</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="risk">
+      <h2><span class="x">13</span>风险</h2>
+      <table>
+        <thead><tr><th>风险</th><th>应对</th></tr></thead>
+        <tbody>
+          <tr><td>JS 站点/反爬</td><td>Playwright 渲染 + 代理池 + 退避；失败留痕重试</td></tr>
+          <tr><td>存储膨胀</td><td>对象存储冷热分层；原文压缩；指针化</td></tr>
+          <tr><td>正文提取不准</td><td>多提取器投票 + 置信度；保留原始 HTML 可重提</td></tr>
+          <tr><td>源封锁/变更</td><td>source_health 告警；多源冗余；选择器可配置</td></tr>
+        </tbody>
+      </table>
+      <div class="callout"><b>下一层：</b>L0 产出的规范化内容经 <code>content.ingested</code> 驱动 <b>L1 数据加工</b>，见《L1 · 架构设计》。</div>
+    </section>
+
+    <div class="foot">L0 数据底座 · 架构设计 · CodePick 分层平台（1/4）· 三段存储 + 可重放血缘 · 2026-05-30</div>
+  </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L0 数据底座 · 实施手册（交付包）</title>
+<style>
+  :root{--bg:#f5f9fb;--card:#fff;--ink:#102230;--muted:#516373;--dim:#8497a6;--line:#dde7ef;--acc:#0891b2;--acc2:#0e7490;--soft:#e3fafe;--green:#0d9488;--gsoft:#e6f9f3;--blue:#2563eb;--bsoft:#e9f0fe;--amber:#c2730a;--asoft:#fff6e8;--rose:#e11d48;--violet:#7c3aed}
+  *{box-sizing:border-box}html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;line-height:1.7;font-size:14.5px}
+  a{color:var(--acc)}.wrap{display:grid;grid-template-columns:250px 1fr;max-width:1300px;margin:0 auto}
+  nav{position:sticky;top:0;height:100vh;overflow-y:auto;padding:22px 13px;border-right:1px solid var(--line);background:#fff}
+  nav .bk{display:inline-block;font-size:10px;font-weight:800;letter-spacing:1px;color:#fff;background:var(--acc);padding:3px 9px;border-radius:6px;margin-bottom:7px}
+  nav .brand{font-weight:800;font-size:14.5px}nav .sub{color:var(--dim);font-size:11px;margin-bottom:12px}
+  nav a{display:block;color:var(--muted);padding:5px 10px;border-radius:7px;font-size:12.3px}nav a:hover{background:var(--soft);color:var(--acc2);text-decoration:none}
+  nav .grp{color:var(--dim);font-size:10px;text-transform:uppercase;letter-spacing:1px;margin:12px 0 2px 10px}
+  main{padding:36px 50px 110px;min-width:0}
+  .tag{display:inline-block;background:var(--soft);color:var(--acc2);border:1px solid #a5e8f2;padding:4px 12px;border-radius:999px;font-size:12.5px;font-weight:700;margin-bottom:12px}
+  h1{font-size:28px;line-height:1.25;margin:0 0 10px;font-weight:800}h1 em{font-style:normal;color:var(--acc)}
+  .lede{color:var(--muted);font-size:15.5px;max-width:830px}
+  .meta{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}.mt{background:#fff;border:1px solid var(--line);border-radius:8px;padding:5px 11px;font-size:11.5px;color:var(--muted)}.mt b{color:var(--ink)}
+  section{margin:34px 0;scroll-margin-top:12px}
+  h2{font-size:20px;margin:0 0 6px;font-weight:800;display:flex;align-items:center;gap:10px;padding-bottom:7px;border-bottom:2px solid var(--line)}
+  h2 .x{background:var(--acc);color:#fff;min-width:25px;height:25px;padding:0 6px;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
+  h3{font-size:15px;margin:18px 0 7px}.note{color:var(--dim);font-size:12.3px;margin-bottom:12px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:12px 0;box-shadow:0 1px 2px rgba(16,24,40,.04)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:12.4px;background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  th,td{padding:8px 11px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}th{background:#e7f6f9;color:var(--ink);font-weight:700}td{color:var(--muted)}tr:last-child td{border-bottom:none}td strong{color:var(--ink)}
+  .hl{color:var(--acc2);font-weight:700}
+  ul.clean{margin:7px 0;padding-left:18px}ul.clean li{margin:3px 0;color:var(--muted)}ul.clean li strong{color:var(--ink)}
+  code{background:#eef2f5;padding:1.5px 6px;border-radius:5px;font-size:12px;color:var(--violet);font-family:Consolas,monospace}
+  pre{background:#0a1820;border:1px solid var(--line);border-radius:11px;padding:14px 16px;overflow-x:auto;font-size:11.6px;line-height:1.5;color:#bfdae2;margin:11px 0}
+  pre .c{color:#5d7c8a}pre .k{color:#7dd3fc}pre .s{color:#6ee7b7}pre .y{color:#fcd34d}pre .t{color:#c4b5fd}pre .r{color:#fca5a5}
+  .box{border-radius:9px;padding:10px 13px;margin:6px 0;font-size:12.6px}
+  .box.acc{background:var(--gsoft);border:1px solid #aee6d8}.box.acc b{color:#0f766e}
+  .callout{border-left:4px solid var(--acc);background:var(--soft);padding:11px 15px;border-radius:0 10px 10px 0;margin:12px 0;color:var(--muted)}.callout.amber{border-color:var(--amber);background:var(--asoft)}.callout.green{border-color:var(--green);background:var(--gsoft)}.callout b{color:var(--ink)}
+  .chk{list-style:none;padding:0;margin:8px 0}
+  .chk li{padding:6px 0 6px 28px;position:relative;border-bottom:1px solid var(--line);font-size:12.7px;color:var(--muted)}.chk li:last-child{border-bottom:none}
+  .chk li::before{content:"☐";position:absolute;left:3px;top:5px;color:var(--acc);font-size:15px}
+  .chk li b{color:var(--ink)}.chk .fid{display:inline-block;font-size:10px;font-weight:800;color:var(--acc2);background:#eaf8fb;border:1px solid #bfeaf1;padding:0 6px;border-radius:5px;margin-right:6px}
+  .done{display:inline-block;font-size:10px;font-weight:800;padding:2px 8px;border-radius:5px;background:var(--gsoft);color:#0f766e}
+  .foot{margin-top:46px;padding-top:16px;border-top:1px solid var(--line);color:var(--dim);font-size:12px}
+  @media(max-width:980px){.wrap{grid-template-columns:1fr}nav{display:none}main{padding:22px 14px 60px}.grid2,.grid3{grid-template-columns:1fr}h1{font-size:22px}}
+  @media print{nav{display:none}.wrap{grid-template-columns:1fr}body{background:#fff}main{padding:0}.card{box-shadow:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <span class="bk">LAYER 0</span>
+    <div class="brand">数据底座 · 实施手册</div>
+    <div class="sub">交付包 · ready-to-build</div>
+    <a href="#status">完成度总览</a>
+    <a href="#deliverables">L0 交付物清单</a>
+    <div class="grp">开工就绪</div>
+    <a href="#env">① 本地环境一键起</a>
+    <a href="#scaffold">② 仓库脚手架</a>
+    <a href="#contracts">③ 模块与接口契约</a>
+    <a href="#config">④ 配置项清单</a>
+    <div class="grp">执行</div>
+    <a href="#checklist">⑤ 逐任务执行清单</a>
+    <a href="#smoke">⑥ 冒烟自检脚本</a>
+    <a href="#dod">⑦ 完成判定</a>
+    <a href="#next">下一步</a>
+  </nav>
+  <main>
+    <span class="tag">L0 实施手册 · 把计划补齐到可开敲</span>
+    <h1>L0 数据底座 — <em>实施手册（交付包）</em></h1>
+    <p class="lede">这份手册把 L0 从"开发计划"补齐到<b>执行级交付包</b>：本地环境一键起、仓库脚手架、模块与接口契约（带签名）、配置清单、逐任务执行清单、端到端冒烟自检。配合《L0 详尽开发 Plan》，照此即可直接开始编码。</p>
+    <div class="meta">
+      <span class="mt">定位：<b>计划 → 代码 的桥</b></span>
+      <span class="mt">配套：<b>L0 详尽开发 Plan</b></span>
+      <span class="mt">状态：<b style="color:var(--green)">L0 文档包已闭环</b></span>
+    </div>
+
+    <section id="status">
+      <h2><span class="x">✓</span>完成度总览</h2>
+      <div class="card">
+        <p style="margin-top:0">L0 的<b>文档/交付包已完整闭环</b>，包含从"为什么"到"怎么建"再到"怎么验"的全链：</p>
+        <table>
+          <thead><tr><th>交付物</th><th>覆盖内容</th><th>状态</th></tr></thead>
+          <tbody>
+            <tr><td>L0 产品文档</td><td>定位、全量保存原则、客户、契约、指标、边界</td><td><span class="done">完成</span></td></tr>
+            <tr><td>L0 架构设计</td><td>三段存储、数据模型、去重、可重放血缘、组件、时序</td><td><span class="done">完成</span></td></tr>
+            <tr><td>L0 详尽开发 Plan</td><td>9 EPIC / ~35 小功能，每个含验收 + 自测、DDL、测试策略</td><td><span class="done">完成</span></td></tr>
+            <tr><td><strong>L0 实施手册（本文）</strong></td><td>环境/脚手架/接口契约/配置/执行清单/冒烟自检</td><td><span class="done">完成</span></td></tr>
+          </tbody>
+        </table>
+        <p style="margin-bottom:0">至此，<b>L0 在"规划层面"已完善到可直接开工</b>。再往下就是按本手册落成实际 Python 工程（需要时我可逐模块生成代码）。</p>
+      </div>
+    </section>
+
+    <section id="deliverables">
+      <h2><span class="x">▤</span>L0 交付物清单（4 份）</h2>
+      <ul class="clean">
+        <li><strong>L0-数据底座-产品文档.html</strong> — 为什么做、做什么、不做什么</li>
+        <li><strong>L0-数据底座-架构设计.html</strong> — 怎么设计（三段存储 / 可重放）</li>
+        <li><strong>L0-开发Plan-详尽版.html</strong> — 拆成小功能 + 验收 + 自测 + DDL</li>
+        <li><strong>L0-实施手册-交付包.html</strong>（本文）— 怎么开工（脚手架 / 接口 / 执行）</li>
+      </ul>
+    </section>
+
+    <section id="env">
+      <h2><span class="x">1</span>本地环境一键起</h2>
+      <p class="note">三个外部依赖：PostgreSQL(+pgvector)、Redis、对象存储(MinIO)。一个 compose 起齐。</p>
+      <h3>deploy/docker-compose.yml</h3>
+      <pre><span class="k">services</span>:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment: { POSTGRES_USER: codepick, POSTGRES_PASSWORD: dev, POSTGRES_DB: codepick }
+    ports: ["5432:5432"]
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    healthcheck: { test: ["CMD","pg_isready","-U","codepick"], interval: 5s, retries: 10 }
+  redis:
+    image: redis:7
+    ports: ["6379:6379"]
+  minio:
+    image: minio/minio
+    command: server /data --console-address ":9001"
+    environment: { MINIO_ROOT_USER: minio, MINIO_ROOT_PASSWORD: minio123 }
+    ports: ["9000:9000","9001:9001"]
+    volumes: ["miniodata:/data"]
+<span class="k">volumes</span>: { pgdata: {}, miniodata: {} }</pre>
+      <h3>Makefile（常用命令）</h3>
+      <pre><span class="s">up</span>:        docker compose -f deploy/docker-compose.yml up -d
+<span class="s">down</span>:      docker compose -f deploy/docker-compose.yml down
+<span class="s">migrate</span>:   uv run alembic upgrade head
+<span class="s">seed</span>:      uv run core-data source import deploy/seed.opml   <span class="c"># 导入起步源</span>
+<span class="s">ingest</span>:    uv run core-data ingest run --all                 <span class="c"># 跑一轮采集</span>
+<span class="s">smoke</span>:     uv run python -m core_data.scripts.smoke           <span class="c"># 端到端自检</span>
+<span class="s">test</span>:      uv run pytest
+<span class="s">lint</span>:      uv run ruff check . && uv run mypy .</pre>
+      <div class="box acc"><b>✓ 验收</b> — <code>make up && make migrate && make smoke</code> 全绿即环境就绪。</div>
+    </section>
+
+    <section id="scaffold">
+      <h2><span class="x">2</span>仓库脚手架</h2>
+      <pre><span class="k">packages/core_data/</span>
+  core_data/
+    config.py              <span class="c"># Settings(pydantic-settings)</span>
+    db/ models.py session.py
+    storage/ object_store.py
+    sources/ repository.py opml.py health.py
+    ingest/
+      scheduler.py rss.py fetcher.py extractor.py
+      dedup.py canonical.py raw_store.py versioning.py
+    events/ outbox.py
+    query/ api.py contracts.py
+    cli.py
+    scripts/ smoke.py
+  tests/
+    unit/  integration/  fixtures/
+  pyproject.toml
+<span class="k">workers/ingestion/</span>
+  worker.py                <span class="c"># Arq WorkerSettings + cron(扫描入队)</span>
+<span class="k">db/</span> alembic/ ...
+<span class="k">deploy/</span> docker-compose.yml .env.example seed.opml
+Makefile  pyproject.toml(uv workspace)</pre>
+      <div class="callout"><b>边界规则：</b><code>core_data</code> 不得 import 任何上层（L1/L2/L3）包，由 import-lint 强制。对上层只暴露 <code>query/</code> 与 <code>events/</code>。</div>
+    </section>
+
+    <section id="contracts">
+      <h2><span class="x">3</span>模块与接口契约（关键签名）</h2>
+      <p class="note">这是"完善"最有价值的部分：把每个模块的对外签名定死，消除实现歧义。</p>
+      <h3>对象存储 + 原始层（不可变）</h3>
+      <pre><span class="k">class</span> <span class="t">ObjectStore</span>(Protocol):
+    <span class="k">def</span> put_bytes(self, key: str, data: bytes, content_type: str) -> str: ...
+    <span class="k">def</span> get_bytes(self, key: str) -> bytes: ...
+    <span class="k">def</span> exists(self, key: str) -> bool: ...
+
+<span class="k">def</span> raw_html_key(source_id: int, sha256: str) -> str:
+    <span class="k">return</span> f<span class="s">"raw/{source_id}/{sha256}.html"</span>
+
+<span class="k">class</span> <span class="t">RawStore</span>:                       <span class="c"># 只追加，无 update/delete</span>
+    <span class="k">def</span> append(self, *, source_id: int, crawl_job_id: int, url: str,
+               fetch_method: str, http_status: int|None=None,
+               http_headers: dict|None=None, raw_entry: dict|None=None,
+               raw_html: bytes|None=None, media: list|None=None,
+               extra: dict|None=None) -> RawDocument: ...
+        <span class="c"># 计算 sha256 → put 对象存储 → insert raw_documents 行</span></pre>
+      <h3>采集：RSS / 抓取 / 提取 / 去重 / 规范化</h3>
+      <pre><span class="k">def</span> fetch_feed(source: Source) -> list[RssEntry]            <span class="c"># F3.1 增量(ETag)</span>
+<span class="k">class</span> <span class="t">FetchResult</span>: html: bytes; status: int; headers: dict; method: str
+<span class="k">def</span> fetch_page(url: str, render: bool) -> FetchResult       <span class="c"># F4.1 httpx/Playwright</span>
+
+<span class="k">class</span> <span class="t">Extracted</span>: title: str|None; author: str|None; text: str
+              published_at: datetime|None; confidence: float
+<span class="k">def</span> extract(html: bytes, url: str) -> Extracted             <span class="c"># F4.3</span>
+
+<span class="k">def</span> url_hash(url: str) -> str                               <span class="c"># F5.1 规范化后</span>
+<span class="k">def</span> content_hash(text: str) -> str
+<span class="k">def</span> simhash(text: str) -> int
+
+<span class="k">class</span> <span class="t">DedupResult</span>(Enum): NEW; SAME_URL; DUPLICATE; VARIANT  <span class="c"># F5.2</span>
+<span class="k">def</span> classify(url: str, text: str) -> tuple[DedupResult, int|None]
+
+<span class="k">def</span> build_content_item(raw: RawDocument, ex: Extracted) -> ContentItem  <span class="c"># F5.3 status=WAIT_FILTER</span></pre>
+      <h3>事件（事务性 outbox）+ 对上层查询契约</h3>
+      <pre><span class="k">def</span> emit(session, topic: str, payload: dict) -> None        <span class="c"># F7.1 同事务写 outbox</span>
+<span class="c"># relay 循环: SELECT ... WHERE published_at IS NULL → publish → mark</span>
+
+<span class="c"># query/contracts.py — 对 L1 的稳定契约</span>
+<span class="k">class</span> <span class="t">ContentOut</span>(BaseModel):
+    id: int; canonical_url: str; title: str|None; clean_text: str
+    lang: str|None; source: SourceRef; published_at: datetime|None; status: str
+
+<span class="k">def</span> list_contents(status: str, since: datetime|None,
+                  limit: int, cursor: str|None) -> Page[ContentRef]   <span class="c"># F7.2</span>
+<span class="k">def</span> get_content(content_id: int) -> ContentOut
+<span class="k">def</span> reprocess(scope: Scope, target_layer: str) -> int                <span class="c"># F7.3</span></pre>
+      <div class="callout green"><b>契约即冻结点：</b>上层 L1 只依赖 <code>list_contents/get_content</code> 与 <code>content.ingested</code> 事件。这些签名一旦定死，L0 内部实现可自由演进而不影响上层。</div>
+    </section>
+
+    <section id="config">
+      <h2><span class="x">4</span>配置项清单（.env.example）</h2>
+      <pre>DATABASE_URL=postgresql+psycopg://codepick:dev@localhost:5432/codepick
+REDIS_URL=redis://localhost:6379/0
+S3_ENDPOINT=http://localhost:9000
+S3_ACCESS_KEY=minio
+S3_SECRET_KEY=minio123
+S3_BUCKET=codepick-raw
+<span class="c"># 采集</span>
+DEFAULT_CRAWL_INTERVAL_MIN=60
+FETCH_TIMEOUT_SEC=30
+PLAYWRIGHT_POOL_SIZE=2
+SOURCE_MAX_CONCURRENCY=2
+EXTRACT_CONFIDENCE_MIN=0.6
+<span class="c"># 行为</span>
+RESPECT_ROBOTS=true
+RETRY_MAX_ATTEMPTS=3</pre>
+      <p class="note">所有运行参数走 env / Settings，禁止硬编码（与平台 ConfigKey 治理一致）。</p>
+    </section>
+
+    <section id="checklist">
+      <h2><span class="x">5</span>逐任务执行清单（按 Sprint）</h2>
+      <p class="note">勾选式执行清单，每条对应开发 Plan 的 Feature。完成判定见各 Feature 的「验收」。</p>
+      <h3>Sprint L0-S1 · 基建</h3>
+      <ul class="chk">
+        <li><span class="fid">F0.1</span> 仓库骨架 + uv workspace + ruff/mypy/import-lint <b>→ pre-commit 全绿</b></li>
+        <li><span class="fid">F0.2</span> ORM 模型 + Alembic 迁移建全表 <b>→ upgrade/downgrade 通过</b></li>
+        <li><span class="fid">F0.3</span> ObjectStore（MinIO）put/get/exists <b>→ 往返字节一致</b></li>
+        <li><span class="fid">F0.4</span> Arq worker + Redis，示例任务入队执行</li>
+        <li><span class="fid">F0.5</span> 结构化日志 + /healthz（DB/Redis/S3）</li>
+      </ul>
+      <h3>Sprint L0-S2 · 源 + RSS</h3>
+      <ul class="chk">
+        <li><span class="fid">F1.1</span> 源 CRUD + CLI <b>→ 重复 feed_url 被拒</b></li>
+        <li><span class="fid">F1.2</span> OPML 幂等导入 <b>→ 重复导入数量不变</b></li>
+        <li><span class="fid">F2.1</span> 周期调度扫描 + 入队 <b>→ 到期源恰入队一次</b></li>
+        <li><span class="fid">F2.2</span> crawl_jobs 记录 + stats</li>
+        <li><span class="fid">F2.3</span> 源级任务锁 <b>→ 并发同源只执行一个</b></li>
+        <li><span class="fid">F3.1</span> RSS 解析（含畸形/304）</li>
+        <li><span class="fid">F3.2</span> 原始 entry 全量保存到 raw_documents</li>
+        <li><span class="fid">F3.3</span> 增量发现 <b>→ 二次拉取 new=0</b></li>
+      </ul>
+      <h3>Sprint L0-S3 · 抓取 + 去重</h3>
+      <ul class="chk">
+        <li><span class="fid">F4.1</span> 抓取器 httpx + Playwright（按 render 开关）</li>
+        <li><span class="fid">F4.2</span> 原始 HTML 入对象存储 + sha256 <b>→ 取回校验一致</b></li>
+        <li><span class="fid">F4.3</span> 正文提取 + 置信度 <b>→ 金标覆盖率达标</b></li>
+        <li><span class="fid">F4.4</span> 失败留痕 + 退避重试</li>
+        <li><span class="fid">F5.1</span> url/content/simhash 指纹</li>
+        <li><span class="fid">F5.2</span> 去重判定 <b>→ 转载=1代表+N原始</b></li>
+        <li><span class="fid">F5.3</span> 规范化建 content_item(WAIT_FILTER)</li>
+      </ul>
+      <h3>Sprint L0-S4 · 原始层 + 事件</h3>
+      <ul class="chk">
+        <li><span class="fid">F6.1</span> 原始层只追加（仓储无 update/delete）</li>
+        <li><span class="fid">F6.2</span> 变更检测 + 版本 <b>→ 改/不改版本数符合预期</b></li>
+        <li><span class="fid">F6.3</span> 血缘 + 重建 <b>→ 清空规范层可从 raw 重建</b></li>
+        <li><span class="fid">F7.1</span> content.ingested outbox + relay <b>→ 不丢不重</b></li>
+        <li><span class="fid">F7.2</span> 内部查询 API（list/get）+ 契约 schema</li>
+        <li><span class="fid">F7.3</span> 重放接口 reprocess</li>
+      </ul>
+    </section>
+
+    <section id="smoke">
+      <h2><span class="x">6</span>端到端冒烟自检脚本</h2>
+      <p class="note"><code>core_data/scripts/smoke.py</code>：一条命令验证整条 L0 链路是否打通。</p>
+      <pre><span class="c"># make smoke 执行流程（伪代码）</span>
+<span class="k">def</span> smoke():
+    <span class="t">1.</span> 导入 1 个测试源(本地 fixture RSS 或真实 feed)
+    <span class="t">2.</span> 同步跑一轮 crawl_source(source_id)
+    <span class="t">3.</span> assert raw_documents.count > 0                 <span class="c"># 原始层有数据</span>
+    <span class="t">4.</span> assert content_items(status=WAIT_FILTER) > 0   <span class="c"># 规范层有实体</span>
+    <span class="t">5.</span> c = get_content(first_id)
+       assert c.clean_text != ""                       <span class="c"># 正文可取回</span>
+       assert object_store.exists(raw_html_ref)        <span class="c"># 原文可溯源</span>
+    <span class="t">6.</span> assert outbox_events(topic="content.ingested") > 0
+    <span class="t">7.</span> 跑 relay，assert 事件被标记 published
+    <span class="t">8.</span> print 摘要: 发现/新增/去重/失败 计数 + 全链 PASS</pre>
+      <div class="box acc"><b>✓ 验收</b> — <code>make smoke</code> 输出 <code>L0 PIPELINE: PASS</code>，且打印各阶段计数。这是 L0 "活着"的日常自检。</div>
+    </section>
+
+    <section id="dod">
+      <h2><span class="x">7</span>完成判定（L0 DoD 复述）</h2>
+      <ul class="chk">
+        <li>导入 OPML → 定时拉 RSS → 全文抓取，全链<b>自动运行 ≥ 24h</b> 无人工干预</li>
+        <li>原始 entry / 原始 HTML / 抓取元数据<b>完整留存可取回校验</b></li>
+        <li>content_items 状态正确、<b>可溯源到 raw_document</b></li>
+        <li>转载/重复正确去重，<b>原始层不丢变体</b></li>
+        <li>内容更新产生<b>新版本</b>，历史可查</li>
+        <li>content.ingested <b>不丢不重</b>，L1 能稳定拉取</li>
+        <li><b>可重放</b>：能从原始层重建规范层，无需重抓</li>
+        <li>覆盖率达标、CI 全绿、/healthz 正常、每次采集有 job 与指标</li>
+      </ul>
+      <div class="callout green"><b>达成即：</b>L0 成为独立、可信、可重放的数据底座，正式向 L1 供数。</div>
+    </section>
+
+    <section id="next">
+      <h2><span class="x">→</span>下一步</h2>
+      <div class="card">
+        <p style="margin-top:0"><b>L0 文档/交付包到此完善闭环</b>（产品 + 架构 + 详尽 Plan + 实施手册）。接下来可二选一：</p>
+        <ul class="clean">
+          <li><strong>A. 落成代码</strong>：按本手册逐模块生成实际 Python 工程（从 F0.1 脚手架开始），我可以直接产出可运行代码。</li>
+          <li><strong>B. 推进 L1</strong>：用同样粒度产出《L1 数据加工开发 Plan》（LangGraph 基础分析图的功能拆解 + 验收 + 自测）。</li>
+        </ul>
+        <p style="margin-bottom:0">告诉我选 A 还是 B（或两者顺序）。</p>
+      </div>
+    </section>
+
+    <div class="foot">L0 数据底座 · 实施手册（交付包）· 计划→代码 的桥 · CodePick 分层平台 · 2026-05-30</div>
+  </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>CodePick Fixture</title>
+    <link>https://example.com</link>
+    <description>Fixture feed</description>
+    <item>
+      <title>Code agents need durable raw data</title>
+      <link>file://PLACEHOLDER/article1.html</link>
+      <guid>fixture-article-1</guid>
+      <description>Raw data matters.</description>
+      <pubDate>Sat, 30 May 2026 10:00:00 GMT</pubDate>
+    </item>
+  </channel>
+</rss>
