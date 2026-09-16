@@ -19,9 +19,9 @@ def test_fetch_feed_rejects_malformed_file(tmp_path: Path) -> None:
         fetch_feed(bad.as_uri())
 
 
-def test_fetch_page_missing_file_raises() -> None:
+def test_fetch_page_missing_file_raises(tmp_path: Path) -> None:
     with pytest.raises(FileNotFoundError):
-        fetch_page(Path("D:/tmp/no-such-codepick-file.html").as_uri())
+        fetch_page((tmp_path / "no-such-codepick-file.html").as_uri())
 
 
 def test_pipeline_records_fetch_failure(session, object_store, tmp_path: Path) -> None:  # type: ignore[no-untyped-def]

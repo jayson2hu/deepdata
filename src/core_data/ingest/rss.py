@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -65,4 +66,8 @@ def _file_url_to_path(url: str) -> Path:
     parsed = urlparse(url)
     if parsed.netloc and parsed.netloc.endswith(":"):
         return Path(url2pathname(f"{parsed.netloc}{parsed.path}"))
+    if parsed.netloc and parsed.netloc != "localhost":
+        if os.name == "nt":
+            return Path(url2pathname(f"//{parsed.netloc}{parsed.path}"))
+        return Path(url2pathname(f"/{parsed.netloc}{parsed.path}"))
     return Path(url2pathname(parsed.path))
