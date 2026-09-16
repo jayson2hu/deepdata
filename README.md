@@ -31,10 +31,10 @@ Docker Desktop/Linux engine 可用后，使用真实 PostgreSQL+pgvector、Redis
 
 ```bash
 make up
-set DATABASE_URL=postgresql+psycopg://codepick:dev@localhost:5432/codepick
-set REDIS_URL=redis://localhost:6379/0
+set DATABASE_URL=postgresql+psycopg://codepick:dev@127.0.0.1:55432/codepick
+set REDIS_URL=redis://127.0.0.1:56379/0
 set OBJECT_STORE_BACKEND=s3
-set S3_ENDPOINT=http://localhost:9000
+set S3_ENDPOINT=http://127.0.0.1:59000
 set S3_ACCESS_KEY=minio
 set S3_SECRET_KEY=minio123
 set S3_BUCKET=codepick-raw
