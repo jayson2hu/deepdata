@@ -23,6 +23,23 @@ WAIT_FILTER = "WAIT_FILTER"
 TREND = "TREND"
 
 
+def _emit_content_ingested(session: Session, item: ContentItem) -> None:
+    if item.id is None:
+        raise ValueError("content item must be persisted before emitting")
+    emit(
+        session,
+        "content.ingested",
+        {
+            "schema_version": 1,
+            "content_id": item.id,
+            "content_version": item.current_version,
+            "content_hash": item.content_hash,
+            "lang": item.lang,
+        },
+        f"content.ingested:{item.id}:v{item.current_version}",
+    )
+
+
 def build_content_item(
     session: Session,
     object_store: ObjectStore,
@@ -63,6 +80,8 @@ def build_content_item(
                     diff_summary="content_hash changed",
                 )
             )
+            session.flush()
+            _emit_content_ingested(session, item)
             session.flush()
         return item
 
@@ -109,12 +128,7 @@ def build_content_item(
             diff_summary="initial version",
         )
     )
-    emit(
-        session,
-        "content.ingested",
-        {"content_id": item.id, "lang": item.lang},
-        f"content.ingested:{item.id}",
-    )
+    _emit_content_ingested(session, item)
     session.flush()
     return item
 
@@ -176,12 +190,7 @@ def build_content_item_from_entry(
     )
     session.add(item)
     session.flush()
-    emit(
-        session,
-        "content.ingested",
-        {"content_id": item.id, "lang": item.lang},
-        f"content.ingested:{item.id}",
-    )
+    _emit_content_ingested(session, item)
     session.flush()
     return item
 

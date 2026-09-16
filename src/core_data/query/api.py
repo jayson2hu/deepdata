@@ -18,6 +18,8 @@ def _source_ref(session: Session, source_id: int | None) -> SourceRef:
 def _ref(session: Session, item: ContentItem) -> ContentRef:
     return ContentRef(
         id=item.id,
+        current_version=item.current_version,
+        content_hash=item.content_hash,
         canonical_url=item.canonical_url,
         title=item.title,
         lang=item.lang,

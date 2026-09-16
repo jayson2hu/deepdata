@@ -4,7 +4,7 @@
 
 [异地开发指南](DEVELOPMENT.md) · [平台总文档与关联仓库](https://github.com/jayson2hu/codepick-docs)
 
-L0 负责采集内容、不可变保存原始层、派生规范层、去重保留变体，并通过事务性 outbox 发出 `content.ingested {content_id, lang}`。
+L0 负责采集内容、不可变保存原始层、派生规范层、去重保留变体，并通过事务性 outbox 发出版本化 `content.ingested`。同 URL 正文变化会创建新的 `content_versions` 行和新的事件，不再被初始事件的幂等键吞掉。
 
 ## 本地运行
 
@@ -65,8 +65,21 @@ python -m core_data.scripts.external_dod --soak-hours 0 --interval-sec 0 --repor
 稳定事件：
 
 ```json
-{"topic":"content.ingested","payload":{"content_id":1,"lang":"en"}}
+{
+  "topic": "content.ingested",
+  "payload": {
+    "schema_version": 1,
+    "content_id": 1,
+    "content_version": 2,
+    "content_hash": "...",
+    "lang": "en"
+  },
+  "idempotency_key": "content.ingested:1:v2"
+}
 ```
+
+初始版本使用 `v1`，正文更新依次使用 `v2`、`v3`。相同版本重复写入仍由
+outbox 唯一键幂等。
 
 稳定查询：
 
@@ -76,6 +89,8 @@ python -m core_data.scripts.external_dod --soak-hours 0 --interval-sec 0 --repor
 稳定字段：
 
 - `id`
+- `current_version`
+- `content_hash`
 - `canonical_url`
 - `title`
 - `clean_text`

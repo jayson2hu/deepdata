@@ -19,17 +19,23 @@ def test_pipeline_preserves_raw_builds_content_and_emits_contract_event(
     assert session.scalar(select(func.count()).select_from(RawDocument)) == 2
     assert session.scalar(select(func.count()).select_from(ContentItem)) == 1
 
-    event = session.scalar(select(OutboxEvent))
-    assert event is not None
-    assert event.topic == "content.ingested"
-    assert set(event.payload) == {"content_id", "lang"}
-
     page = list_contents(session, status="WAIT_FILTER", since=None, limit=1, cursor=None)
     assert len(page.items) == 1
     content = get_content(session, object_store, page.items[0].id)
+    event = session.scalar(select(OutboxEvent))
+    assert event is not None
+    assert event.topic == "content.ingested"
+    assert event.payload == {
+        "schema_version": 1,
+        "content_id": content.id,
+        "content_version": 1,
+        "content_hash": session.get(ContentItem, content.id).content_hash,
+        "lang": content.lang,
+    }
+
     assert content.status == "WAIT_FILTER"
     assert "immutable raw data layer" in content.clean_text
 
     published: list[str] = []
     assert relay_once(session, lambda topic, payload, key: published.append(key)) == 1
-    assert published == [f"content.ingested:{content.id}"]
+    assert published == [f"content.ingested:{content.id}:v1"]

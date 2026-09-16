@@ -4,7 +4,7 @@ from pathlib import Path
 
 from sqlalchemy import func, select
 
-from core_data.db.models import ContentItem, ContentVersion
+from core_data.db.models import ContentItem, ContentVersion, OutboxEvent
 from core_data.ingest.canonical import build_content_item
 from core_data.ingest.extractor import extract
 from core_data.ingest.raw_store import RawStore
@@ -40,3 +40,10 @@ def test_same_url_changed_content_creates_new_version(session, object_store) -> 
     assert updated.current_version == 2
     assert session.scalar(select(func.count()).select_from(ContentVersion)) == 2
     assert session.scalar(select(func.count()).select_from(ContentItem)) == 1
+    events = session.scalars(select(OutboxEvent).order_by(OutboxEvent.id)).all()
+    assert [event.idempotency_key for event in events] == [
+        f"content.ingested:{item.id}:v1",
+        f"content.ingested:{item.id}:v2",
+    ]
+    assert [event.payload["content_version"] for event in events] == [1, 2]
+    assert events[-1].payload["content_hash"] == updated.content_hash

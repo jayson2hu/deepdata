@@ -15,6 +15,8 @@ class SourceRef(BaseModel):
 
 class ContentRef(BaseModel):
     id: int
+    current_version: int
+    content_hash: str | None
     canonical_url: str
     title: str | None
     lang: str | None

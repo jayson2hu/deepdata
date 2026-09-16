@@ -24,6 +24,11 @@ python -m core_data.scripts.smoke
 
 默认可用 SQLite 和文件对象存储验证 L0。真实基础设施启动入口：`docker compose -f deploy/docker-compose.yml up -d`；浏览器抓取需要 `python -m playwright install chromium`。真实 PostgreSQL、Redis、MinIO 的联调步骤见 README 和 docs。
 
+同 URL 正文变化会自动发出新的版本事件。可用
+`python -m core_data.scripts.relay --once` 将待发布 outbox 写入 Redis；
+事件幂等键包含 `content_id` 和 `content_version`。跨层 Redis/Arq 验收见
+平台仓库 `scripts/verify_version_loop.py`。
+
 Ubuntu 测试 Compose 仅绑定 localhost，并使用 PostgreSQL `55432`、Redis `56379`、MinIO API `59000`、MinIO Console `59001`，避免覆盖宿主机默认端口。
 
 ## 交接范围
