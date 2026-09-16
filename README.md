@@ -1,5 +1,7 @@
 # CodePick L0 数据底座
 
+[2026-09-12 当前验证与剩余工作](docs/2026-09-12-continuation.md) · [平台项目进度](../codepick-docs/PROJECT_STATUS.md)
+
 [异地开发指南](DEVELOPMENT.md) · [平台总文档与关联仓库](https://github.com/jayson2hu/codepick-docs)
 
 L0 负责采集内容、不可变保存原始层、派生规范层、去重保留变体，并通过事务性 outbox 发出 `content.ingested {content_id, lang}`。
