@@ -27,6 +27,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
+  "fakeredis[lua]>=2.31",
   "pytest>=8",
   "pytest-cov>=5",
   "pytest-asyncio>=0.23",
