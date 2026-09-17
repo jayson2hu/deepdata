@@ -5,6 +5,21 @@ from dataclasses import dataclass
 from datetime import datetime
 from html.parser import HTMLParser
 
+import trafilatura
+
+TAIL_MARKERS = (
+    "\nTags:\nWritten by\nRelated posts",
+    "\nRelated posts\n",
+)
+
+
+def _trim_site_tail(text: str) -> str:
+    lowered = text.casefold()
+    positions = [lowered.find(marker.casefold()) for marker in TAIL_MARKERS]
+    valid_positions = [position for position in positions if position >= 0]
+    return text[: min(valid_positions)].rstrip() if valid_positions else text
+
+
 
 @dataclass(frozen=True)
 class Extracted:
@@ -48,11 +63,19 @@ class _TextExtractor(HTMLParser):
 
 
 def extract(html: bytes, url: str) -> Extracted:
-    del url
     parser = _TextExtractor()
     parser.feed(html.decode("utf-8", errors="replace"))
     title = " ".join(parser.title_parts).strip() or None
-    text = re.sub(r"\s+", " ", " ".join(parser.text_parts)).strip()
+    document = trafilatura.extract(
+        html,
+        url=url,
+        include_comments=False,
+        include_tables=False,
+        favor_precision=True,
+    )
+    document = _trim_site_tail(document) if document else None
+    fallback = " ".join(parser.text_parts)
+    text = re.sub(r"\s+", " ", document if document else fallback).strip()
     confidence = min(1.0, len(text) / 500.0) if text else 0.0
     lang = "zh" if re.search(r"[\u4e00-\u9fff]", text) else "en"
     return Extracted(

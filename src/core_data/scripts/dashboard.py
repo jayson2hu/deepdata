@@ -9,7 +9,8 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import parse_qs, urlparse
 
-from sqlalchemy import func, select
+from sqlalchemy import func, inspect, select
+from sqlalchemy.exc import SQLAlchemyError
 
 from core_data.config import get_settings
 from core_data.db.bootstrap import create_all
@@ -20,6 +21,7 @@ from core_data.db.models import (
     OutboxEvent,
     RawDocument,
     Source,
+    SourceHealth,
 )
 from core_data.db.session import SessionLocal, engine
 from core_data.ingest.adapters import get_adapter, list_types
@@ -41,12 +43,16 @@ _TEMPLATE_PATH = Path(__file__).resolve().parent / "dashboard.html"
 
 
 class DashboardHandler(BaseHTTPRequestHandler):
-    server_version = "CodePickL0Dashboard/0.3"
+    server_version = "CodePickL0Dashboard/0.4"
+
+    @property
+    def read_only(self) -> bool:
+        return bool(getattr(self.server, "read_only", False))
 
     def do_GET(self) -> None:
         parsed = urlparse(self.path)
         if parsed.path in {"/", "/index.html"}:
-            self._send_html(_render_index())
+            self._send_html(_render_index(read_only=self.read_only))
             return
         if parsed.path == "/api/status":
             params = parse_qs(parsed.query)
@@ -55,7 +61,19 @@ class DashboardHandler(BaseHTTPRequestHandler):
             range_key = params.get("range", ["24h"])[0] if params else "24h"
             if range_key not in RANGES:
                 range_key = "24h"
-            self._send_json(_status(range_key=range_key, jobs_offset=offset, jobs_limit=limit))
+            try:
+                payload = _status(range_key=range_key, jobs_offset=offset, jobs_limit=limit)
+            except SQLAlchemyError:
+                self._send_json(
+                    {
+                        "error": "状态读取失败，请检查测试数据库后重试",
+                        "code": "storage_unavailable",
+                    },
+                    status=HTTPStatus.SERVICE_UNAVAILABLE,
+                )
+                return
+            payload["read_only"] = self.read_only
+            self._send_json(payload)
             return
         if parsed.path == "/api/source-types":
             self._send_json({"types": list_types()})
@@ -63,6 +81,12 @@ class DashboardHandler(BaseHTTPRequestHandler):
         self.send_error(HTTPStatus.NOT_FOUND, "Not found")
 
     def do_POST(self) -> None:
+        if self.read_only:
+            self._send_json(
+                {"error": "只读预览不允许采集或修改数据", "code": "read_only"},
+                status=HTTPStatus.FORBIDDEN,
+            )
+            return
         parsed = urlparse(self.path)
         body = self._read_json()
         try:
@@ -208,9 +232,7 @@ def _status(
     with SessionLocal() as session:
         source_count = session.scalar(select(func.count()).select_from(Source)) or 0
         source_enabled = (
-            session.scalar(
-                select(func.count()).select_from(Source).where(Source.enabled.is_(True))
-            )
+            session.scalar(select(func.count()).select_from(Source).where(Source.enabled.is_(True)))
             or 0
         )
         raw_count = session.scalar(select(func.count()).select_from(RawDocument)) or 0
@@ -226,7 +248,37 @@ def _status(
             or 0
         )
         outbox_published = outbox_total - outbox_pending
-        delivery_rate = round(outbox_published / outbox_total * 100, 1) if outbox_total else 100.0
+        delivery_rate = round(outbox_published / outbox_total * 100, 1) if outbox_total else None
+        source_health = {
+            str(health): int(count)
+            for health, count in session.execute(
+                select(func.coalesce(SourceHealth.status, "unknown"), func.count())
+                .select_from(Source)
+                .outerjoin(SourceHealth, Source.id == SourceHealth.source_id)
+                .group_by(func.coalesce(SourceHealth.status, "unknown"))
+            ).all()
+        }
+        failed_jobs_count = (
+            session.scalar(
+                select(func.count()).select_from(CrawlJob).where(CrawlJob.status == "failed")
+            )
+            or 0
+        )
+        failed_jobs = session.scalars(
+            select(CrawlJob)
+            .where(CrawlJob.status == "failed")
+            .order_by(CrawlJob.started_at.desc())
+            .limit(5)
+        ).all()
+        pending_events = session.scalars(
+            select(OutboxEvent)
+            .where(OutboxEvent.published_at.is_(None))
+            .order_by(OutboxEvent.created_at.asc())
+            .limit(5)
+        ).all()
+        source_names: dict[int | None, str] = dict(
+            session.execute(select(Source.id, Source.name)).tuples().all()
+        )
 
         status_breakdown = {
             str(status): int(count)
@@ -254,7 +306,7 @@ def _status(
         sources = session.scalars(select(Source).order_by(Source.created_at.desc()).limit(50)).all()
 
         return {
-            "generated_at": datetime.now().isoformat(timespec="seconds"),
+            "generated_at": datetime.now(UTC).isoformat(timespec="seconds"),
             "range": range_key,
             "counts": {
                 "sources": source_count,
@@ -266,9 +318,30 @@ def _status(
                 "outbox_published": outbox_published,
                 "outbox_pending": outbox_pending,
                 "delivery_rate": delivery_rate,
+                "failed_jobs": failed_jobs_count,
             },
             "series": _series(session, range_key),
             "status_breakdown": status_breakdown,
+            "source_health": source_health,
+            "failed_jobs": [
+                {
+                    "id": job.id,
+                    "source_name": source_names.get(job.source_id, "未知来源"),
+                    "started_at": _as_utc(job.started_at),
+                    "error": job.error,
+                }
+                for job in failed_jobs
+            ],
+            "pending_events": [
+                {
+                    "id": item.id,
+                    "topic": item.topic,
+                    "content_id": item.payload.get("content_id"),
+                    "content_version": item.payload.get("content_version"),
+                    "created_at": _as_utc(item.created_at),
+                }
+                for item in pending_events
+            ],
             "scheduler": _scheduler_status(),
             "sources": [
                 {
@@ -285,6 +358,11 @@ def _status(
                     "doc_count": doc_counts.get(source.id, 0),
                     "health": (source.health.status if source.health else "unknown"),
                     "fail_count": (source.health.fail_count if source.health else 0),
+                    "last_ok_at": _as_utc(source.health.last_ok_at) if source.health else None,
+                    "last_attempt_at": (
+                        _as_utc(source.health.last_attempt_at) if source.health else None
+                    ),
+                    "health_note": source.health.note if source.health else None,
                 }
                 for source in sources
             ],
@@ -295,7 +373,10 @@ def _status(
                     "canonical_url": item.canonical_url,
                     "lang": item.lang,
                     "status": item.status,
-                    "fetched_at": item.fetched_at,
+                    "fetched_at": _as_utc(item.fetched_at),
+                    "published_at": _as_utc(item.published_at),
+                    "current_version": item.current_version,
+                    "source_name": source_names.get(item.source_id, "未知来源"),
                     "meta": item.meta,
                 }
                 for item in contents
@@ -304,9 +385,10 @@ def _status(
                 {
                     "id": job.id,
                     "source_id": job.source_id,
+                    "source_name": source_names.get(job.source_id, "未知来源"),
                     "kind": job.kind,
                     "status": job.status,
-                    "started_at": job.started_at,
+                    "started_at": _as_utc(job.started_at),
                     "stats": job.stats,
                     "error": job.error,
                 }
@@ -380,18 +462,53 @@ def _run_crawl(body: dict[str, Any]) -> dict[str, Any]:
         return {"source_id": source_id, "stats": stats}
 
 
-def _render_index() -> str:
-    return _TEMPLATE_PATH.read_text(encoding="utf-8")
+def _render_index(*, read_only: bool = False) -> str:
+    return _TEMPLATE_PATH.read_text(encoding="utf-8").replace(
+        "__READ_ONLY__", "true" if read_only else "false"
+    )
+
+
+class DashboardServer(ThreadingHTTPServer):
+    def __init__(self, address: tuple[str, int], *, read_only: bool = False) -> None:
+        self.read_only = read_only
+        super().__init__(address, DashboardHandler)
+
+
+def _prepare_database(*, read_only: bool) -> None:
+    if not read_only:
+        create_all(engine)
+        return
+    if engine.dialect.name == "sqlite":
+        database = engine.url.database
+        if not database or database == ":memory:" or not Path(database).is_file():
+            raise ValueError("只读预览需要已存在的 L0 SQLite 数据库文件")
+    required = {
+        "sources",
+        "source_health",
+        "raw_documents",
+        "content_items",
+        "content_versions",
+        "crawl_jobs",
+        "outbox_events",
+    }
+    missing = required - set(inspect(engine).get_table_names())
+    if missing:
+        raise ValueError(f"只读预览缺少 L0 表，请先完成测试库迁移：{', '.join(sorted(missing))}")
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8088)
+    parser.add_argument("--read-only", action="store_true", help="只读取现有 L0 库，禁止采集与修改")
     args = parser.parse_args()
-    create_all(engine)
-    server = ThreadingHTTPServer((args.host, args.port), DashboardHandler)
-    print(f"L0 dashboard: http://{args.host}:{args.port}")
+    try:
+        _prepare_database(read_only=args.read_only)
+    except (ValueError, SQLAlchemyError) as exc:
+        parser.error(str(exc))
+    server = DashboardServer((args.host, args.port), read_only=args.read_only)
+    mode = "只读预览" if args.read_only else "本地开发管理"
+    print(f"L0 dashboard ({mode}): http://{args.host}:{args.port}")
     server.serve_forever()
 
 

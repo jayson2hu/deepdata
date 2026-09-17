@@ -125,3 +125,16 @@ python -m core_data.scripts.audit_dod
 ```
 
 当前 fixtures 覆盖：RSS → raw_documents → HTML 对象存储 →正文提取 → content_items(WAIT_FILTER) → outbox → L1 查询契约。
+
+## 小批量真实公开内容预览
+
+内置 manifest 只登记官方公开 feed，并限制每源 5 篇、20 秒超时、0.5 秒页面间隔和最短正文。原文与数据库只写入调用者指定的本机目录：
+
+```bash
+.venv/bin/python -m core_data.scripts.real_preview \
+  --data-dir /tmp/codepick-real-preview-20260917/l0 \
+  --manifest deploy/real-preview-sources.json \
+  --report /tmp/codepick-real-preview-20260917/l0-report.json
+```
+
+抽取规则升级后，可显式增加 `--reuse` 在同一数据库中重新抓取；正文变化必须经过去重、`content_versions` 和版本化 outbox，不能直接改 SQL。报告保留来源级失败和页面错误，零内容时命令返回失败。设计、权限边界和 2026-09-17 实测见 [真实公开内容预览](docs/2026-09-17-real-public-preview.md)。

@@ -12,7 +12,14 @@ from core_data.storage.object_store import ObjectStore
 
 def _source_ref(session: Session, source_id: int | None) -> SourceRef:
     source = session.get(Source, source_id) if source_id is not None else None
-    return SourceRef(id=source.id if source else source_id, name=source.name if source else None)
+    return SourceRef(
+        id=source.id if source else source_id,
+        name=source.name if source else None,
+        kind=source.type if source else None,
+        home_url=source.home_url if source else None,
+        feed_url=source.feed_url if source else None,
+        etiquette=source.etiquette if source else {},
+    )
 
 
 def _ref(session: Session, item: ContentItem) -> ContentRef:
@@ -25,6 +32,7 @@ def _ref(session: Session, item: ContentItem) -> ContentRef:
         lang=item.lang,
         source=_source_ref(session, item.source_id),
         published_at=item.published_at,
+        fetched_at=item.fetched_at,
         status=item.status,
     )
 

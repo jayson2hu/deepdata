@@ -25,6 +25,7 @@ def fetch_page(url: str, render: bool = False, timeout_sec: int = 30) -> FetchRe
         data = _file_url_to_path(url).read_bytes()
         return FetchResult(data, 200, {}, "file")
     response = httpx.get(url, timeout=timeout_sec, follow_redirects=True)
+    response.raise_for_status()
     return FetchResult(
         bytes(response.content),
         response.status_code,

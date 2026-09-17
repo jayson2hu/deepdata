@@ -165,7 +165,10 @@ def test_pipeline_crawls_github_trending_without_page_fetch(
 
     stats = crawl_source(session, object_store, source)
 
-    assert stats == {"entries": 1, "raw": 1, "content": 1, "failed": 0, "media": 0, "trend": 1}
+    assert stats == {
+        "entries": 1, "raw": 1, "content": 1, "failed": 0, "rejected": 0,
+        "media": 0, "trend": 1,
+    }
     assert session.scalar(select(func.count()).select_from(RawDocument)) == 1
     assert session.scalar(select(func.count()).select_from(ContentItem)) == 1
     job = session.scalar(select(CrawlJob))

@@ -11,6 +11,10 @@ T = TypeVar("T")
 class SourceRef(BaseModel):
     id: int | None
     name: str | None = None
+    kind: str | None = None
+    home_url: str | None = None
+    feed_url: str | None = None
+    etiquette: dict[str, object] = Field(default_factory=dict)
 
 
 class ContentRef(BaseModel):
@@ -23,6 +27,7 @@ class ContentRef(BaseModel):
     source: SourceRef
     published_at: datetime | None
     status: str
+    fetched_at: datetime
 
 
 class ContentOut(ContentRef):

@@ -12,7 +12,14 @@ from core_data.sources.repository import create_source
 def test_pipeline_preserves_raw_builds_content_and_emits_contract_event(
     session, object_store, fixture_rss  # type: ignore[no-untyped-def]
 ) -> None:
-    source = create_source(session, name="Fixture", feed_url=fixture_rss.as_uri())
+    source = create_source(
+        session,
+        name="Fixture",
+        feed_url=fixture_rss.as_uri(),
+        home_url="https://example.com",
+        source_type="rss",
+    )
+    source.etiquette = {"source_kind": "public_feed", "display_policy": "excerpt-and-link"}
     stats = crawl_source(session, object_store, source)
 
     assert stats["entries"] == 1
@@ -35,6 +42,13 @@ def test_pipeline_preserves_raw_builds_content_and_emits_contract_event(
 
     assert content.status == "WAIT_FILTER"
     assert "immutable raw data layer" in content.clean_text
+    assert content.title == "Code agents need durable raw data"
+    assert content.published_at.isoformat() == "2026-05-30T10:00:00"
+    assert content.fetched_at is not None
+    assert content.source.kind == "rss"
+    assert content.source.home_url == "https://example.com"
+    assert content.source.feed_url == fixture_rss.as_uri()
+    assert content.source.etiquette["source_kind"] == "public_feed"
 
     published: list[str] = []
     assert relay_once(session, lambda topic, payload, key: published.append(key)) == 1

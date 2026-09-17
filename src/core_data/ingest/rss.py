@@ -2,13 +2,28 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 from urllib.parse import urlparse
 from urllib.request import url2pathname
 
 import feedparser
 import httpx
+from dateutil.parser import ParserError
+from dateutil.parser import parse as parse_datetime
+
+
+def parse_published(value: object) -> datetime | None:
+    if not isinstance(value, str) or not value.strip():
+        return None
+    try:
+        parsed = cast(datetime, parse_datetime(value))
+    except (ParserError, OverflowError, ValueError):
+        return None
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=UTC)
+    return parsed.astimezone(UTC)
 
 
 @dataclass(frozen=True)

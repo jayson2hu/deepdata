@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "purpose": "Private local CodePick product preview using official public feeds",
+  "sources": [
+    {
+      "name": "GitHub Changelog",
+      "type": "rss",
+      "home_url": "https://github.blog/changelog/",
+      "feed_url": "https://github.blog/changelog/feed/",
+      "crawl_config": {
+        "max_entries": 5,
+        "request_timeout_sec": 20,
+        "request_delay_sec": 0.5,
+        "min_text_chars": 300,
+        "max_text_chars": 200000
+      },
+      "etiquette": {
+        "source_kind": "public_feed",
+        "display_policy": "excerpt-and-link",
+        "attribution_required": true
+      }
+    },
+    {
+      "name": "GitHub Engineering",
+      "type": "rss",
+      "home_url": "https://github.blog/engineering/",
+      "feed_url": "https://github.blog/engineering/feed/",
+      "crawl_config": {
+        "max_entries": 5,
+        "request_timeout_sec": 20,
+        "request_delay_sec": 0.5,
+        "min_text_chars": 300,
+        "max_text_chars": 200000
+      },
+      "etiquette": {
+        "source_kind": "public_feed",
+        "display_policy": "excerpt-and-link",
+        "attribution_required": true
+      }
+    },
+    {
+      "name": "Google Developers Blog",
+      "type": "rss",
+      "home_url": "https://developers.googleblog.com/",
+      "feed_url": "https://developers.googleblog.com/feeds/posts/default",
+      "crawl_config": {
+        "max_entries": 5,
+        "request_timeout_sec": 20,
+        "request_delay_sec": 0.5,
+        "min_text_chars": 300,
+        "max_text_chars": 200000
+      },
+      "etiquette": {
+        "source_kind": "public_feed",
+        "display_policy": "excerpt-and-link",
+        "attribution_required": true
+      }
+    }
+  ]
+}

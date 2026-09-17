@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from time import sleep
+
 from sqlalchemy.orm import Session
 
 from core_data.db.models import CrawlJob, Source
@@ -25,8 +27,12 @@ def crawl_source(
     session.add(job)
     session.flush()
     mark_attempt(session, source.id)
-    stats = {"entries": 0, "raw": 0, "content": 0, "failed": 0, "media": 0, "trend": 0}
+    stats = {
+        "entries": 0, "raw": 0, "content": 0, "failed": 0, "rejected": 0,
+        "media": 0, "trend": 0,
+    }
     raw_store = RawStore(session, object_store)
+    request_number = 0
     try:
         for entry in adapter.fetch_entries(source):
             stats["entries"] += 1
@@ -54,7 +60,15 @@ def crawl_source(
                     stats["trend"] += 1
                 continue
             try:
-                fetch = fetch_page(entry.url, render=bool(source.crawl_config.get("render")))
+                delay = float(source.crawl_config.get("request_delay_sec", 0))
+                if request_number and delay > 0:
+                    sleep(delay)
+                request_number += 1
+                fetch = fetch_page(
+                    entry.url,
+                    render=bool(source.crawl_config.get("render")),
+                    timeout_sec=int(source.crawl_config.get("request_timeout_sec", 30)),
+                )
                 raw_html = raw_store.append(
                     source_id=source.id,
                     crawl_job_id=job.id,
@@ -69,14 +83,25 @@ def crawl_source(
                 )
                 stats["raw"] += 1
                 extracted = extract(fetch.html, entry.url)
-                if entry.title and not extracted.title:
-                    extracted = extracted.__class__(
-                        title=entry.title,
-                        author=extracted.author or entry.extra.get("author"),
-                        text=extracted.text,
-                        published_at=extracted.published_at,
-                        confidence=extracted.confidence,
-                        lang=extracted.lang,
+                extracted = extracted.__class__(
+                    title=entry.title or extracted.title,
+                    author=extracted.author or entry.extra.get("author"),
+                    text=extracted.text,
+                    published_at=extracted.published_at or entry.published_at,
+                    confidence=extracted.confidence,
+                    lang=extracted.lang,
+                )
+                min_chars = int(source.crawl_config.get("min_text_chars", 1))
+                max_chars = int(source.crawl_config.get("max_text_chars", 1_000_000))
+                if len(extracted.text) < min_chars:
+                    stats["rejected"] += 1
+                    raise ValueError(
+                        f"extracted text too short: {len(extracted.text)} < {min_chars}"
+                    )
+                if len(extracted.text) > max_chars:
+                    stats["rejected"] += 1
+                    raise ValueError(
+                        f"extracted text too long: {len(extracted.text)} > {max_chars}"
                     )
                 item = build_content_item(session, object_store, raw_html, extracted)
                 if item.raw_document_id == raw_html.id:
